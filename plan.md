@@ -6,42 +6,51 @@ A personal blog platform for sharing thoughts, articles, and life experiences wi
 
 ---
 
-## Tech Stack
+## Tech Stack (100% Open Source)
 
 ### Recommended: Full-Stack .NET + Angular (Leverage Your Experience)
 
 #### Backend
-- **Framework:** ASP.NET Core 8 Web API
-- **Database:** PostgreSQL (or SQL Server if preferred)
-- **ORM:** Entity Framework Core
-- **Authentication:** ASP.NET Core Identity + Google OAuth
-- **File Storage:** Azure Blob Storage / AWS S3 / Local storage
-- **Caching:** Redis (for sessions, subscription notifications)
+- **Framework:** ASP.NET Core 8 Web API (MIT License)
+- **Database:** PostgreSQL (PostgreSQL License - OSI approved)
+- **ORM:** Entity Framework Core (MIT License)
+- **Authentication:** ASP.NET Core Identity + Google OAuth (free API)
+- **File Storage:** MinIO (self-hosted S3-compatible, AGPL) or local filesystem
+- **Caching:** Redis (BSD License)
+- **Email:** MailKit + self-hosted SMTP (Mailcow/Postal) or free tier services
 
 #### Frontend
-- **Framework:** Angular 17+ (standalone components)
-- **UI Library:** Angular Material or Tailwind CSS
-- **Rich Text Editor:** Quill.js, TinyMCE, or Editor.js
-- **State Management:** NgRx or Angular Signals
+- **Framework:** Angular 17+ standalone components (MIT License)
+- **UI Library:** Tailwind CSS (MIT License) or Angular Material (MIT)
+- **Rich Text Editor:** Quill.js (BSD) or Editor.js (Apache 2.0)
+- **State Management:** NgRx (MIT) or Angular Signals (built-in)
 
 #### Infrastructure
-- **Hosting:** Azure App Service / AWS / DigitalOcean
-- **CI/CD:** GitHub Actions
-- **Containerization:** Docker (optional but recommended)
+- **Hosting:** Self-hosted VPS (Hetzner/Contabo) or free tiers (Railway, Render, Fly.io)
+- **CI/CD:** GitHub Actions (free for public repos)
+- **Containerization:** Docker + Docker Compose (Apache 2.0)
+- **Reverse Proxy:** Nginx (BSD) or Caddy (Apache 2.0, auto HTTPS)
+- **Monitoring:** Prometheus + Grafana (Apache 2.0)
+
+#### Development Tools
+- **API Documentation:** Swagger/OpenAPI (Apache 2.0)
+- **Database Migrations:** EF Core Migrations (built-in)
+- **Local Email Testing:** Mailpit (MIT) or MailHog (MIT)
 
 ---
 
 ### Alternative: Modern Full-Stack (If Open to Learning)
 
-#### Option A: Next.js + Supabase
-- **Frontend/Backend:** Next.js 14 (App Router)
-- **Database + Auth:** Supabase (PostgreSQL + built-in auth)
-- **Styling:** Tailwind CSS
-- **Rich Text:** Tiptap or Lexical
-- **Pros:** Faster development, built-in auth, real-time subscriptions
+#### Option A: Next.js + Self-hosted Supabase
+- **Frontend/Backend:** Next.js 14 App Router (MIT License)
+- **Database + Auth:** Self-hosted Supabase (Apache 2.0) or PostgreSQL + NextAuth.js
+- **Styling:** Tailwind CSS (MIT)
+- **Rich Text:** Tiptap (MIT) or Lexical (MIT)
+- **Pros:** Faster development, SSR/SSG, great DX
 
-#### Option B: .NET Backend + React/Next.js Frontend
+#### Option B: .NET Backend + Next.js Frontend
 - Hybrid approach keeping .NET backend expertise
+- Best of both worlds: robust API + modern React frontend
 
 ---
 
@@ -147,8 +156,8 @@ Media
 
 ### Content Storage
 - **Blog content:** Stored as HTML or Markdown in database
-- **Images:** Stored in blob storage, referenced by URL
-- **Thumbnails:** Auto-generated on upload
+- **Images:** Stored locally or in MinIO (self-hosted), referenced by URL
+- **Thumbnails:** Auto-generated on upload using ImageSharp (Apache 2.0)
 
 ### API Design
 - RESTful API with versioning (`/api/v1/...`)
