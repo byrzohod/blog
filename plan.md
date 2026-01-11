@@ -8,137 +8,275 @@ A personal blog platform for sharing thoughts, articles, and life experiences wi
 
 ## Tech Stack (100% Open Source)
 
-### Recommended: Full-Stack .NET + Angular (Leverage Your Experience)
+### Next.js Full-Stack with TypeScript
 
-#### Backend
-- **Framework:** ASP.NET Core 8 Web API (MIT License)
+#### Core Framework
+- **Framework:** Next.js 14+ App Router (MIT License)
+- **Language:** TypeScript (Apache 2.0)
+- **Runtime:** Node.js (MIT License)
+
+#### Database & ORM
 - **Database:** PostgreSQL (PostgreSQL License - OSI approved)
-- **ORM:** Entity Framework Core (MIT License)
-- **Authentication:** ASP.NET Core Identity + Google OAuth (free API)
-- **File Storage:** MinIO (self-hosted S3-compatible, AGPL) or local filesystem
-- **Caching:** Redis (BSD License)
-- **Email:** MailKit + self-hosted SMTP (Mailcow/Postal) or free tier services
+- **ORM:** Prisma (Apache 2.0) - type-safe database access
+- **Migrations:** Prisma Migrate (built-in)
+
+#### Authentication
+- **Auth Library:** NextAuth.js / Auth.js (ISC License)
+- **Providers:** Email/password + Google OAuth
+- **Session:** JWT tokens or database sessions
 
 #### Frontend
-- **Framework:** Angular 17+ standalone components (MIT License)
-- **UI Library:** Tailwind CSS (MIT License) or Angular Material (MIT)
-- **Rich Text Editor:** Quill.js (BSD) or Editor.js (Apache 2.0)
-- **State Management:** NgRx (MIT) or Angular Signals (built-in)
+- **UI Framework:** React 18+ (MIT License)
+- **Styling:** Tailwind CSS (MIT License)
+- **Components:** shadcn/ui (MIT) - copy-paste components
+- **Icons:** Lucide React (ISC License)
+- **Rich Text Editor:** Tiptap (MIT License) - extensible, headless
+- **Forms:** React Hook Form (MIT) + Zod validation (MIT)
+
+#### File Handling
+- **Upload:** Local filesystem or MinIO (AGPL)
+- **Image Processing:** Sharp (Apache 2.0) - resize, optimize
+- **Storage Path:** `/public/uploads` or S3-compatible bucket
+
+#### Email
+- **Library:** Nodemailer (MIT) or React Email (MIT)
+- **Dev Testing:** Mailpit (MIT)
+- **Production:** Any SMTP provider
 
 #### Infrastructure
-- **Hosting:** Self-hosted VPS (Hetzner/Contabo) or free tiers (Railway, Render, Fly.io)
-- **CI/CD:** GitHub Actions (free for public repos)
 - **Containerization:** Docker + Docker Compose (Apache 2.0)
-- **Reverse Proxy:** Nginx (BSD) or Caddy (Apache 2.0, auto HTTPS)
-- **Monitoring:** Prometheus + Grafana (Apache 2.0)
+- **Reverse Proxy:** Caddy (Apache 2.0) - automatic HTTPS
+- **Hosting:** Self-hosted VPS (Hetzner/Contabo) or Coolify (Apache 2.0)
+- **CI/CD:** GitHub Actions (free for public repos)
 
 #### Development Tools
-- **API Documentation:** Swagger/OpenAPI (Apache 2.0)
-- **Database Migrations:** EF Core Migrations (built-in)
-- **Local Email Testing:** Mailpit (MIT) or MailHog (MIT)
+- **Linting:** ESLint (MIT) + Prettier (MIT)
+- **Testing:** Vitest (MIT) + Playwright (Apache 2.0)
+- **Dev Database:** Docker PostgreSQL container
 
 ---
 
-### Alternative: Modern Full-Stack (If Open to Learning)
+## Project Structure
 
-#### Option A: Next.js + Self-hosted Supabase
-- **Frontend/Backend:** Next.js 14 App Router (MIT License)
-- **Database + Auth:** Self-hosted Supabase (Apache 2.0) or PostgreSQL + NextAuth.js
-- **Styling:** Tailwind CSS (MIT)
-- **Rich Text:** Tiptap (MIT) or Lexical (MIT)
-- **Pros:** Faster development, SSR/SSG, great DX
-
-#### Option B: .NET Backend + Next.js Frontend
-- Hybrid approach keeping .NET backend expertise
-- Best of both worlds: robust API + modern React frontend
+```
+blog/
+├── src/
+│   ├── app/                      # Next.js App Router
+│   │   ├── (public)/             # Public pages (no auth)
+│   │   │   ├── page.tsx          # Homepage
+│   │   │   ├── blog/             # Blog listing & posts
+│   │   │   ├── about/            # About me page
+│   │   │   ├── thoughts/         # Thoughts section
+│   │   │   └── contact/          # Contact page
+│   │   ├── (auth)/               # Auth pages
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   └── layout.tsx
+│   │   ├── admin/                # Admin dashboard (protected)
+│   │   │   ├── posts/            # Post management
+│   │   │   ├── comments/         # Comment moderation
+│   │   │   ├── subscribers/      # Subscriber management
+│   │   │   └── settings/
+│   │   ├── api/                  # API routes
+│   │   │   ├── auth/             # NextAuth endpoints
+│   │   │   ├── posts/
+│   │   │   ├── comments/
+│   │   │   ├── subscribe/
+│   │   │   └── upload/
+│   │   ├── layout.tsx            # Root layout
+│   │   └── globals.css
+│   ├── components/               # React components
+│   │   ├── ui/                   # shadcn/ui components
+│   │   ├── blog/                 # Blog-specific components
+│   │   ├── editor/               # Rich text editor
+│   │   └── layout/               # Header, footer, nav
+│   ├── lib/                      # Utilities
+│   │   ├── db.ts                 # Prisma client
+│   │   ├── auth.ts               # Auth configuration
+│   │   ├── utils.ts              # Helper functions
+│   │   └── validations/          # Zod schemas
+│   └── types/                    # TypeScript types
+├── prisma/
+│   ├── schema.prisma             # Database schema
+│   └── seed.ts                   # Seed data
+├── public/
+│   ├── uploads/                  # User uploads
+│   └── images/                   # Static images
+├── docker-compose.yml            # Dev environment
+├── Dockerfile                    # Production build
+├── .env.example                  # Environment template
+└── package.json
+```
 
 ---
 
 ## Core Features
 
 ### Phase 1: Foundation
-- [ ] Project setup and architecture
-- [ ] Database schema design
-- [ ] User authentication (email/password)
-- [ ] Basic blog post CRUD operations
-- [ ] Simple blog listing page
+- [ ] Project setup (Next.js + TypeScript + Tailwind)
+- [ ] Docker Compose for PostgreSQL
+- [ ] Prisma schema and initial migration
+- [ ] Basic layout (header, footer, navigation)
+- [ ] Homepage with placeholder content
 
-### Phase 2: Content Creation
-- [ ] Rich text editor integration
-- [ ] Image upload and management
+### Phase 2: Authentication
+- [ ] NextAuth.js setup
+- [ ] Email/password registration and login
+- [ ] Google OAuth integration
+- [ ] Protected routes middleware
+- [ ] User profile page
+
+### Phase 3: Blog Core
+- [ ] Blog post listing page
+- [ ] Individual post page with slug routing
+- [ ] Tiptap rich text editor integration
+- [ ] Image upload for posts
 - [ ] Draft/publish workflow
 - [ ] Categories and tags
-- [ ] SEO-friendly URLs (slugs)
 
-### Phase 3: Static Pages
-- [ ] "About Me" / "Way of Life" pages
+### Phase 4: Static Pages
+- [ ] "About Me" / "Way of Life" page
 - [ ] "Thoughts" section
-- [ ] Contact page
-- [ ] Custom page builder (optional)
+- [ ] Contact page with form
+- [ ] SEO optimization (meta tags, sitemap)
 
-### Phase 4: User Engagement
-- [ ] Google OAuth integration
+### Phase 5: User Engagement
 - [ ] Commenting system
-- [ ] Comment moderation
-- [ ] User profiles
+- [ ] Comment moderation (admin)
+- [ ] User roles and permissions
+- [ ] User profile customization
 
-### Phase 5: Subscriptions & Notifications
-- [ ] Email subscription system
-- [ ] Newsletter functionality
-- [ ] "Latest News" feed/widget
-- [ ] RSS feed
+### Phase 6: Subscriptions & Notifications
+- [ ] Email subscription form
+- [ ] Subscriber management
+- [ ] Newsletter sending
+- [ ] "Latest News" widget
+- [ ] RSS feed generation
 
-### Phase 6: Advanced Features (Future)
-- [ ] Allow guest authors to submit posts
-- [ ] Post approval workflow
-- [ ] Analytics dashboard
+### Phase 7: Polish & Advanced
+- [ ] Dark mode toggle
 - [ ] Search functionality
-- [ ] Dark mode
+- [ ] Analytics dashboard
+- [ ] Performance optimization
+- [ ] Guest author submissions (optional)
 
 ---
 
-## Database Schema (High-Level)
+## Database Schema (Prisma)
 
-```
-Users
-├── Id, Email, PasswordHash, DisplayName, Avatar
-├── GoogleId (for OAuth)
-├── Role (Admin, Author, Subscriber, Guest)
-└── CreatedAt, UpdatedAt
+```prisma
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String?
+  avatar        String?
+  role          Role      @default(SUBSCRIBER)
+  googleId      String?   @unique
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-Posts
-├── Id, Title, Slug, Content, Excerpt
-├── AuthorId (FK → Users)
-├── Status (Draft, Published, Archived)
-├── FeaturedImage
-├── PublishedAt, CreatedAt, UpdatedAt
-└── CategoryId, Tags[]
+  posts         Post[]
+  comments      Comment[]
+  accounts      Account[]
+  sessions      Session[]
+}
 
-Categories
-├── Id, Name, Slug, Description
-└── ParentId (for nested categories)
+model Post {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String    @db.Text
+  excerpt       String?
+  featuredImage String?
+  status        PostStatus @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-Comments
-├── Id, PostId, UserId, Content
-├── ParentId (for replies)
-├── Status (Pending, Approved, Spam)
-└── CreatedAt
+  author        User      @relation(fields: [authorId], references: [id])
+  authorId      String
+  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId    String?
+  tags          Tag[]
+  comments      Comment[]
+}
 
-Subscribers
-├── Id, Email, Name
-├── IsVerified, VerificationToken
-├── Preferences (JSON)
-└── SubscribedAt
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  posts       Post[]
+}
 
-Pages (Static)
-├── Id, Title, Slug, Content
-├── Template, Order
-└── IsPublished
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[]
+}
 
-Media
-├── Id, FileName, Url, MimeType
-├── UploadedBy (FK → Users)
-└── CreatedAt
+model Comment {
+  id        String        @id @default(cuid())
+  content   String        @db.Text
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  author    User          @relation(fields: [authorId], references: [id])
+  authorId  String
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  parentId  String?
+  replies   Comment[]     @relation("CommentReplies")
+}
+
+model Subscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  isVerified   Boolean  @default(false)
+  verifyToken  String?
+  subscribedAt DateTime @default(now())
+}
+
+model Page {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  content     String  @db.Text
+  isPublished Boolean @default(false)
+  order       Int     @default(0)
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+  SUBSCRIBER
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+}
 ```
 
 ---
@@ -146,41 +284,93 @@ Media
 ## Architecture Decisions
 
 ### Authentication Strategy
-1. **Local accounts** - Email/password with ASP.NET Identity
-2. **Google OAuth** - For easy sign-in
-3. **Role-based access:**
-   - **Admin** - Full control
-   - **Author** - Can create/edit own posts
-   - **Subscriber** - Can comment, receives newsletters
-   - **Guest** - Read-only, can subscribe
+- **NextAuth.js** handles all auth flows
+- **Credentials provider** for email/password
+- **Google provider** for OAuth
+- **JWT strategy** for stateless sessions
+- **Middleware** protects admin routes
 
 ### Content Storage
-- **Blog content:** Stored as HTML or Markdown in database
-- **Images:** Stored locally or in MinIO (self-hosted), referenced by URL
-- **Thumbnails:** Auto-generated on upload using ImageSharp (Apache 2.0)
+- **Blog content:** HTML stored in PostgreSQL (Tiptap outputs HTML)
+- **Images:** Local `/public/uploads` or MinIO bucket
+- **Thumbnails:** Generated on upload with Sharp
 
 ### API Design
-- RESTful API with versioning (`/api/v1/...`)
-- JWT tokens for authentication
-- Rate limiting for public endpoints
+- **Server Actions** for mutations (Next.js 14+)
+- **Route Handlers** for complex API logic
+- **Zod** for input validation
+- **Prisma** for type-safe queries
+
+### Rendering Strategy
+- **Static Generation (SSG):** Blog posts, static pages
+- **Server Components:** Default for all pages
+- **Client Components:** Interactive elements only (editor, forms)
+- **ISR:** Incremental regeneration for blog listing
+
+---
+
+## Environment Variables
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/blog"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# Email (production)
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="your-email"
+SMTP_PASS="your-password"
+
+# Upload
+UPLOAD_DIR="./public/uploads"
+MAX_FILE_SIZE="5242880"
+```
+
+---
+
+## Development Workflow
+
+```bash
+# Start development
+docker compose up -d          # Start PostgreSQL
+npm run dev                   # Start Next.js
+
+# Database
+npx prisma migrate dev        # Run migrations
+npx prisma studio             # Visual database browser
+npx prisma db seed            # Seed test data
+
+# Build & Deploy
+npm run build                 # Production build
+npm run start                 # Start production server
+docker build -t blog .        # Build Docker image
+```
 
 ---
 
 ## Open Questions
 
 1. **Guest posting:** Should registered users be able to submit posts for review?
-2. **Monetization:** Any plans for paid subscriptions or premium content?
-3. **Multi-language:** Will the blog support multiple languages?
-4. **Social sharing:** Integration with social media platforms?
-5. **Analytics:** Custom analytics or Google Analytics integration?
+2. **Multi-language:** Will the blog support multiple languages?
+3. **Social sharing:** Integration with social media platforms?
+4. **Analytics:** Custom analytics or privacy-friendly alternative (Plausible/Umami)?
+5. **Comments:** Allow anonymous comments or require login?
 
 ---
 
 ## Next Steps
 
-1. Finalize tech stack decision
-2. Set up development environment
-3. Create initial project structure
-4. Design database schema in detail
-5. Implement authentication
-6. Build basic CRUD for blog posts
+1. Initialize Next.js project with TypeScript
+2. Set up Docker Compose for PostgreSQL
+3. Configure Prisma and create initial schema
+4. Set up NextAuth.js with credentials provider
+5. Build basic layout and homepage
+6. Implement blog post CRUD
