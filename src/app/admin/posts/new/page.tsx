@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TiptapEditor } from '@/components/editor/tiptap-editor';
+import { ImageUpload } from '@/components/editor/image-upload';
+import { MediaPickerDialog } from '@/components/editor/media-picker-dialog';
 import { createPost } from '@/app/actions/posts';
 import { generateSlug } from '@/lib/utils';
 
@@ -33,6 +35,8 @@ export default function NewPostPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState('');
+  const [featuredImage, setFeaturedImage] = useState<string | undefined>();
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
 
   const {
     register,
@@ -62,6 +66,7 @@ export default function NewPostPage() {
     const result = await createPost({
       ...data,
       content,
+      featuredImage,
       status,
     });
 
@@ -73,6 +78,10 @@ export default function NewPostPage() {
 
     router.push('/admin/posts');
     router.refresh();
+  };
+
+  const handleMediaSelect = (url: string) => {
+    setFeaturedImage(url);
   };
 
   return (
@@ -136,7 +145,12 @@ export default function NewPostPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug">
+                  Slug
+                  <span className="ml-2 text-xs text-foreground-muted font-normal">
+                    (URL-friendly version of title, e.g., my-first-post)
+                  </span>
+                </Label>
                 <Input
                   id="slug"
                   placeholder="post-url-slug"
@@ -179,17 +193,11 @@ export default function NewPostPage() {
               <CardTitle>Featured Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="featuredImage">Image URL</Label>
-                <Input
-                  id="featuredImage"
-                  placeholder="https://..."
-                  {...register('featuredImage')}
-                />
-                <p className="text-xs text-foreground-muted">
-                  Enter an image URL or upload via Media Library
-                </p>
-              </div>
+              <ImageUpload
+                value={featuredImage}
+                onChange={setFeaturedImage}
+                onOpenMediaLibrary={() => setMediaPickerOpen(true)}
+              />
             </CardContent>
           </Card>
 
@@ -219,6 +227,12 @@ export default function NewPostPage() {
           </Card>
         </div>
       </div>
+
+      <MediaPickerDialog
+        open={mediaPickerOpen}
+        onOpenChange={setMediaPickerOpen}
+        onSelect={handleMediaSelect}
+      />
     </div>
   );
 }

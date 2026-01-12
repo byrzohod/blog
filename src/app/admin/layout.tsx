@@ -1,16 +1,33 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
-import { FileText, Image as ImageIcon, MessageSquare, Settings, Users, Home } from 'lucide-react';
+import {
+  FileText,
+  Image as ImageIcon,
+  MessageSquare,
+  Settings,
+  Users,
+  Home,
+  Tags,
+  FolderOpen,
+  Mail,
+  Activity,
+  BarChart3,
+} from 'lucide-react';
 import { authOptions } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: Home },
   { name: 'Posts', href: '/admin/posts', icon: FileText },
+  { name: 'Categories', href: '/admin/categories', icon: FolderOpen },
+  { name: 'Tags', href: '/admin/tags', icon: Tags },
   { name: 'Media', href: '/admin/media', icon: ImageIcon },
   { name: 'Comments', href: '/admin/comments', icon: MessageSquare },
   { name: 'Users', href: '/admin/users', icon: Users },
+  { name: 'Subscribers', href: '/admin/subscribers', icon: Mail },
+  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Activity', href: '/admin/activity', icon: Activity },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

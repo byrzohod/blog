@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TiptapEditor } from '@/components/editor/tiptap-editor';
+import { ImageUpload } from '@/components/editor/image-upload';
+import { MediaPickerDialog } from '@/components/editor/media-picker-dialog';
 import { AutosaveIndicator } from '@/components/editor/autosave-indicator';
 import { useAutosave } from '@/hooks/use-autosave';
 import { updatePost, deletePost, getPostById } from '@/app/actions/posts';
@@ -48,6 +50,8 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [content, setContent] = useState('');
+  const [featuredImage, setFeaturedImage] = useState<string | undefined>();
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<'DRAFT' | 'PUBLISHED' | 'ARCHIVED'>('DRAFT');
 
@@ -56,7 +60,6 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     handleSubmit,
     formState: { errors },
     setError,
-    setValue,
     reset,
     watch,
   } = useForm<PostForm>({
@@ -66,7 +69,6 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   // Watch form values for autosave
   const watchedTitle = watch('title');
   const watchedExcerpt = watch('excerpt');
-  const watchedFeaturedImage = watch('featuredImage');
   const watchedMetaTitle = watch('metaTitle');
   const watchedMetaDescription = watch('metaDescription');
 
@@ -75,10 +77,10 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     title: watchedTitle,
     content,
     excerpt: watchedExcerpt,
-    featuredImage: watchedFeaturedImage,
+    featuredImage,
     metaTitle: watchedMetaTitle,
     metaDescription: watchedMetaDescription,
-  }), [watchedTitle, content, watchedExcerpt, watchedFeaturedImage, watchedMetaTitle, watchedMetaDescription]);
+  }), [watchedTitle, content, watchedExcerpt, featuredImage, watchedMetaTitle, watchedMetaDescription]);
 
   // Auto-save functionality
   const { status: autosaveStatus, lastSavedAt, error: autosaveError } = useAutosave({
@@ -112,6 +114,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
         metaDescription: post.metaDescription || '',
       });
       setContent(post.content);
+      setFeaturedImage(post.featuredImage || undefined);
       setCurrentStatus(post.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED');
       setIsFetching(false);
     }
@@ -125,6 +128,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     const result = await updatePost(postId, {
       ...data,
       content,
+      featuredImage,
       status,
     });
 
@@ -152,6 +156,10 @@ export default function EditPostPage({ params }: EditPostPageProps) {
 
     router.push('/admin/posts');
     router.refresh();
+  };
+
+  const handleMediaSelect = (url: string) => {
+    setFeaturedImage(url);
   };
 
   if (isFetching) {
@@ -240,7 +248,12 @@ export default function EditPostPage({ params }: EditPostPageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug">
+                  Slug
+                  <span className="ml-2 text-xs text-foreground-muted font-normal">
+                    (URL-friendly version of title, e.g., my-first-post)
+                  </span>
+                </Label>
                 <Input
                   id="slug"
                   placeholder="post-url-slug"
@@ -283,17 +296,11 @@ export default function EditPostPage({ params }: EditPostPageProps) {
               <CardTitle>Featured Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="featuredImage">Image URL</Label>
-                <Input
-                  id="featuredImage"
-                  placeholder="https://..."
-                  {...register('featuredImage')}
-                />
-                <p className="text-xs text-foreground-muted">
-                  Enter an image URL or upload via Media Library
-                </p>
-              </div>
+              <ImageUpload
+                value={featuredImage}
+                onChange={setFeaturedImage}
+                onOpenMediaLibrary={() => setMediaPickerOpen(true)}
+              />
             </CardContent>
           </Card>
 
@@ -323,6 +330,12 @@ export default function EditPostPage({ params }: EditPostPageProps) {
           </Card>
         </div>
       </div>
+
+      <MediaPickerDialog
+        open={mediaPickerOpen}
+        onOpenChange={setMediaPickerOpen}
+        onSelect={handleMediaSelect}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
