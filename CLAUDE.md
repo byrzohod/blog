@@ -6,7 +6,7 @@ This file contains essential context about the blog project that should be under
 
 ## Project Overview
 
-**Name:** Personal Blog Platform
+**Name:** Book of Life - Personal Blog Platform
 **Owner:** Sarkis Haralampiev
 **Purpose:** A personal blog for sharing thoughts, articles, and life experiences with community engagement features.
 
@@ -16,19 +16,63 @@ This file contains essential context about the blog project that should be under
 
 | Layer | Technology | License |
 |-------|------------|---------|
-| Framework | Next.js 14+ (App Router) | MIT |
+| Framework | Next.js 16.1.1 (App Router) | MIT |
 | Language | TypeScript | Apache 2.0 |
 | Database | PostgreSQL | PostgreSQL License |
 | ORM | Prisma | Apache 2.0 |
 | Auth | NextAuth.js (Auth.js) | ISC |
-| Styling | Tailwind CSS | MIT |
-| Components | shadcn/ui | MIT |
+| Styling | Tailwind CSS v4 | MIT |
+| Components | shadcn/ui (Radix primitives) | MIT |
 | Rich Text | Tiptap | MIT |
 | Forms | React Hook Form + Zod | MIT |
 | Images | Sharp | Apache 2.0 |
 | Container | Docker + Docker Compose | Apache 2.0 |
+| Unit Testing | Vitest + Testing Library | MIT |
+| E2E Testing | Playwright | Apache 2.0 |
 
 **Principle:** 100% open source technologies only. No paid services or proprietary dependencies.
+
+---
+
+## Application Features
+
+### Public Features
+- **Homepage** - Hero section with featured posts and recent articles
+- **Blog Listing** - Paginated posts with category/tag filtering
+- **Blog Post** - Full article view with rich content, reading time, share buttons
+- **Categories** - Filter posts by category (Technology, Life, Travel, etc.)
+- **Tags** - Filter posts by tags (nextjs, react, typescript, etc.)
+- **Search** - Full-text search across posts with debounced input
+- **About Page** - Static page with author information
+- **Contact Page** - Contact form with email validation
+- **Subscribe Page** - Email newsletter subscription
+- **RSS/JSON Feed** - /feed.xml and /feed.json for feed readers
+- **Archive** - Chronological listing of all posts
+- **Sitemap/Robots** - SEO optimization files
+
+### Authentication Features
+- **Login** - Email/password authentication
+- **Register** - User registration with validation
+- **Password Reset** - Forgot password and reset flow via email
+- **Google OAuth** - Sign in with Google (optional)
+- **Role-based Access** - ADMIN, AUTHOR, SUBSCRIBER roles
+- **Protected Routes** - Middleware-based route protection
+
+### Admin Features
+- **Dashboard** - Stats overview (posts, comments, subscribers)
+- **Post Management** - Create, edit, delete posts with rich text editor
+- **Category Management** - CRUD for categories with slug generation
+- **Tag Management** - CRUD for tags with association tracking
+- **Comment Moderation** - Approve, reject, delete comments
+- **User Management** - View and manage users
+- **Media Library** - Upload and manage images
+
+### Accessibility Features
+- **Skip Links** - Skip to main content
+- **ARIA Landmarks** - Proper semantic structure
+- **Keyboard Navigation** - Full keyboard support
+- **Focus Management** - Visible focus indicators
+- **Screen Reader Support** - Alt text, labels, roles
 
 ---
 
@@ -37,28 +81,421 @@ This file contains essential context about the blog project that should be under
 ```
 blog/
 ├── src/
-│   ├── app/                  # Next.js App Router pages
-│   │   ├── (public)/         # Public pages (blog, about, contact)
-│   │   ├── (auth)/           # Auth pages (login, register)
-│   │   ├── admin/            # Protected admin dashboard
-│   │   └── api/              # API route handlers
+│   ├── app/                      # Next.js App Router pages
+│   │   ├── (public)/             # Public pages (blog, about, contact)
+│   │   ├── (auth)/               # Auth pages (login, register)
+│   │   ├── admin/                # Protected admin dashboard
+│   │   ├── api/                  # API route handlers
+│   │   ├── actions/              # Server Actions
+│   │   └── globals.css           # Global styles with CSS custom properties
 │   ├── components/
-│   │   ├── ui/               # shadcn/ui components
-│   │   ├── blog/             # Blog-specific components
-│   │   ├── editor/           # Rich text editor components
-│   │   └── layout/           # Header, footer, navigation
-│   ├── lib/                  # Utilities (db, auth, helpers)
-│   └── types/                # TypeScript type definitions
-├── prisma/                   # Database schema and migrations
-├── public/uploads/           # User-uploaded files
-└── docker-compose.yml        # Development database
+│   │   ├── ui/                   # shadcn/ui components (themed)
+│   │   ├── blog/                 # Blog-specific components
+│   │   ├── editor/               # Rich text editor components
+│   │   └── layout/               # Header, footer, navigation, skip-link
+│   ├── styles/
+│   │   └── design-tokens.ts      # Centralized color, spacing, typography tokens
+│   ├── lib/                      # Utilities (db, auth, helpers)
+│   ├── types/                    # TypeScript type definitions
+│   └── __tests__/                # Unit/integration tests (Vitest)
+│       ├── setup.ts              # Test setup with mocks
+│       ├── components/           # Component tests
+│       └── lib/                  # Utility tests
+├── e2e/                          # Playwright E2E tests
+│   ├── fixtures/                 # Test fixtures (auth, data)
+│   ├── pages/                    # Page Object Models
+│   └── *.spec.ts                 # Test specifications
+├── prisma/
+│   ├── schema.prisma             # Database schema
+│   ├── migrations/               # Database migrations
+│   ├── seed.ts                   # Production seed data
+│   └── seed-test.ts              # Test seed data
+├── public/uploads/               # User-uploaded files
+├── playwright.config.ts          # Playwright configuration
+├── vitest.config.ts              # Vitest configuration
+└── docker-compose.yml            # Development database (PostgreSQL + Mailpit)
 ```
+
+---
+
+## Testing Requirements
+
+**IMPORTANT:** Every new feature, bug fix, and code change MUST include comprehensive tests:
+
+### Test Pyramid
+
+```
+       /\
+      /  \       E2E UI Tests (Playwright)
+     /----\      - Full user flows across browsers
+    /      \     - Visual and interaction testing
+   /--------\
+  /          \   Integration Tests (Vitest)
+ /            \  - API routes, Server Actions
+/--------------\ - Database operations, Auth flows
+|              |
+|  Unit Tests  | Unit Tests (Vitest)
+|   (Vitest)   | - Utility functions, Helpers
+|              | - Component rendering
+----------------
+```
+
+### 1. Unit Tests (Vitest + Testing Library)
+
+**Location:** `src/__tests__/`
+**Config:** `vitest.config.ts`
+**Run:** `npm test`
+
+Test individual functions and components in isolation:
+
+```typescript
+// src/__tests__/lib/utils.test.ts
+import { describe, it, expect } from 'vitest';
+import { formatDate, generateSlug } from '@/lib/utils';
+
+describe('formatDate', () => {
+  it('should format date correctly', () => {
+    expect(formatDate(new Date('2024-01-15'))).toBe('January 15, 2024');
+  });
+});
+```
+
+```typescript
+// src/__tests__/components/button.test.tsx
+import { render, screen } from '@testing-library/react';
+import { Button } from '@/components/ui/button';
+
+describe('Button', () => {
+  it('should render with text', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByRole('button')).toHaveTextContent('Click me');
+  });
+});
+```
+
+### 2. Integration Tests (Vitest)
+
+**Location:** `src/__tests__/integration/`
+**Run:** `npm test`
+
+Test how multiple parts work together:
+
+```typescript
+// src/__tests__/integration/auth.test.ts
+import { describe, it, expect } from 'vitest';
+import { validateCredentials } from '@/lib/auth';
+
+describe('Authentication', () => {
+  it('should validate correct credentials', async () => {
+    const result = await validateCredentials('admin@test.com', 'password');
+    expect(result).toBeTruthy();
+  });
+});
+```
+
+### 3. E2E UI Tests (Playwright)
+
+**Location:** `e2e/`
+**Config:** `playwright.config.ts`
+**Run:** `npm run test:e2e`
+
+Test full user flows across browsers:
+
+```typescript
+// e2e/auth.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('should login with valid credentials', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('admin@bookoflife.com');
+  await page.getByLabel('Password').fill('admin123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page).toHaveURL('/');
+});
+```
+
+### Test Coverage Requirements
+
+| Test Type | Coverage Target | Focus Areas |
+|-----------|----------------|-------------|
+| Unit | 80%+ | Utils, helpers, pure functions |
+| Integration | 70%+ | API routes, Server Actions, auth |
+| E2E UI | All user flows | Critical paths, happy paths, error states |
+
+### Writing Tests for New Features
+
+When implementing any new feature:
+
+1. **Start with test plan** - Define what needs to be tested
+2. **Write unit tests** - For any new utility functions
+3. **Write integration tests** - For API endpoints and Server Actions
+4. **Write E2E tests** - For user-facing functionality
+5. **Test error states** - Validation errors, network errors, edge cases
+6. **Test accessibility** - Keyboard nav, screen readers, ARIA
+
+---
+
+## E2E Test Suites
+
+Current E2E test coverage (185 tests across 5 browsers):
+
+| Suite | Tests | Description |
+|-------|-------|-------------|
+| `home.spec.ts` | 17 | Homepage, navigation, theme toggle |
+| `auth.spec.ts` | 14 | Login, register, logout, protected routes |
+| `blog.spec.ts` | 14 | Blog listing, categories, tags, posts |
+| `search.spec.ts` | 5 | Search functionality |
+| `subscription.spec.ts` | 8 | Email subscription, RSS, JSON feed |
+| `contact.spec.ts` | 5 | Contact form |
+| `password-reset.spec.ts` | 10 | Password reset flow |
+| `admin-dashboard.spec.ts` | 8 | Admin dashboard and navigation |
+| `admin-posts.spec.ts` | 14 | Post CRUD operations |
+| `admin-categories.spec.ts` | 9 | Category management |
+| `admin-tags.spec.ts` | 10 | Tag management |
+| `accessibility.spec.ts` | 18 | Skip links, landmarks, keyboard nav |
+
+### E2E Test Patterns
+
+**Page Object Models** (`e2e/pages/`):
+```typescript
+// e2e/pages/post-editor.page.ts
+export class PostEditorPage {
+  constructor(private page: Page) {}
+
+  async fillTitle(title: string) {
+    await this.page.getByLabel('Title').fill(title);
+  }
+
+  async publish() {
+    await this.page.getByRole('button', { name: /publish/i }).click();
+  }
+}
+```
+
+**Auth Fixtures** (`e2e/fixtures/auth.fixture.ts`):
+```typescript
+export const test = base.extend<{ adminPage: Page }>({
+  adminPage: async ({ browser }, use) => {
+    const page = await browser.newPage();
+    await loginAs(page, TEST_USERS.admin);
+    await use(page);
+  },
+});
+```
+
+---
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 20+
+- Docker & Docker Compose
+- pnpm/npm
+
+### Quick Start
+
+```bash
+# 1. Clone and install
+git clone https://github.com/byrzohod/blog.git
+cd blog
+npm install
+
+# 2. Start services
+docker compose up -d
+
+# 3. Setup database
+npx prisma migrate dev
+npx prisma db seed
+
+# 4. Start development
+npm run dev
+```
+
+### Service Ports
+
+| Service | Port | URL |
+|---------|------|-----|
+| Next.js App | 3001 | http://localhost:3001 |
+| PostgreSQL | 5435 | localhost:5435 |
+| Mailpit SMTP | 1025 | localhost:1025 |
+| Mailpit UI | 8025 | http://localhost:8025 |
+
+### Admin Credentials (After Seeding)
+
+| Field | Value |
+|-------|-------|
+| Email | admin@bookoflife.com |
+| Password | admin123 |
+| Role | ADMIN |
+
+---
+
+## All Commands Reference
+
+### Development
+
+```bash
+npm run dev                    # Start dev server (port 3001)
+npm run build                  # Production build
+npm run start                  # Start production server
+npm run lint                   # Run ESLint
+npm run type-check             # TypeScript type checking
+```
+
+### Database
+
+```bash
+docker compose up -d           # Start PostgreSQL + Mailpit
+docker compose down            # Stop services
+npx prisma migrate dev         # Create/apply migrations
+npx prisma migrate reset       # Reset database (destructive)
+npx prisma generate            # Regenerate Prisma Client
+npx prisma db seed             # Seed with production data
+npm run test:seed              # Seed with test data
+npx prisma studio              # Visual database browser
+```
+
+### Testing
+
+```bash
+# Unit & Integration Tests (Vitest)
+npm test                       # Run all unit tests
+npm test -- --watch            # Watch mode
+npm test -- --coverage         # With coverage report
+npm test -- path/to/test       # Run specific test file
+
+# E2E Tests (Playwright)
+npm run test:e2e               # Run all E2E tests (all browsers)
+npx playwright test --project=chromium  # Chromium only (fastest)
+npx playwright test --project=firefox   # Firefox only
+npx playwright test --project=webkit    # Safari only
+npx playwright test e2e/auth.spec.ts    # Run specific test file
+npx playwright test --ui                 # Interactive UI mode
+npx playwright test --debug              # Debug mode with inspector
+npx playwright show-report               # View HTML test report
+npx playwright codegen                   # Generate tests by recording
+```
+
+### Code Quality
+
+```bash
+npm run lint                   # ESLint
+npm run type-check             # TypeScript
+npx prettier --write .         # Format code
+```
+
+---
+
+## Debugging Guide
+
+### Debug Next.js Server
+
+```bash
+# Start with Node.js inspector
+NODE_OPTIONS='--inspect' npm run dev
+
+# Open Chrome DevTools: chrome://inspect
+```
+
+### Debug Playwright Tests
+
+```bash
+# Interactive debug mode
+npx playwright test --debug
+
+# UI mode with trace viewer
+npx playwright test --ui
+
+# View trace after failure
+npx playwright show-trace trace.zip
+```
+
+### Debug Database
+
+```bash
+# Open Prisma Studio
+npx prisma studio
+
+# Check database logs
+docker compose logs db
+
+# Connect directly
+docker exec -it blog-db psql -U postgres -d blog
+```
+
+### Debug Email (Mailpit)
+
+Open http://localhost:8025 to view all sent emails during development.
+
+### VS Code Debug Configuration
+
+Add to `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: debug server-side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Next.js: debug client-side",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001"
+    },
+    {
+      "name": "Playwright: debug tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx playwright test --debug"
+    }
+  ]
+}
+```
+
+---
+
+## Required Skills
+
+### Core Development Skills
+
+| Skill | Usage | Learn More |
+|-------|-------|------------|
+| TypeScript | All code | typescriptlang.org |
+| React 19 | UI components | react.dev |
+| Next.js 16 (App Router) | Framework | nextjs.org/docs |
+| Tailwind CSS v4 | Styling | tailwindcss.com |
+| Prisma | Database ORM | prisma.io/docs |
+| NextAuth.js | Authentication | authjs.dev |
+
+### Testing Skills
+
+| Skill | Usage | Learn More |
+|-------|-------|------------|
+| Vitest | Unit/integration tests | vitest.dev |
+| Testing Library | Component testing | testing-library.com |
+| Playwright | E2E testing | playwright.dev |
+| Page Object Model | Test organization | playwright.dev/docs/pom |
+
+### DevOps Skills
+
+| Skill | Usage | Learn More |
+|-------|-------|------------|
+| Docker | Local database | docs.docker.com |
+| Git | Version control | git-scm.com |
+| GitHub Actions | CI/CD (planned) | docs.github.com/actions |
 
 ---
 
 ## Key Conventions
 
 ### Code Style
+
 - Use TypeScript strict mode
 - Prefer Server Components by default
 - Use 'use client' only when necessary (forms, interactivity)
@@ -67,13 +504,16 @@ blog/
 - Prefer Server Actions over API routes for mutations
 
 ### Naming Conventions
+
 - **Files:** kebab-case (`post-card.tsx`)
 - **Components:** PascalCase (`PostCard`)
 - **Functions:** camelCase (`createPost`)
 - **Database:** snake_case in Prisma schema maps to camelCase in code
 - **Routes:** kebab-case (`/blog/my-first-post`)
+- **Test Files:** `*.test.ts`, `*.test.tsx`, `*.spec.ts`
 
 ### Component Organization
+
 ```tsx
 // 1. Imports
 // 2. Types/Interfaces
@@ -96,6 +536,7 @@ blog/
 | Subscriber | Email newsletter subscribers |
 | Page | Static pages (about, contact) |
 | Media | Uploaded files tracking |
+| PasswordResetToken | Password reset flow |
 
 ---
 
@@ -105,56 +546,73 @@ blog/
 - **Roles:** ADMIN (full access), AUTHOR (own posts), SUBSCRIBER (comments)
 - **Protected routes:** `/admin/*` requires ADMIN or AUTHOR
 - **Middleware:** `src/middleware.ts` handles route protection
-
----
-
-## Common Commands
-
-```bash
-# Development
-docker compose up -d          # Start PostgreSQL
-npm run dev                   # Start Next.js dev server
-
-# Database
-npx prisma migrate dev        # Create/apply migrations
-npx prisma studio             # Visual database browser
-npx prisma generate           # Regenerate Prisma Client
-npx prisma db seed            # Seed database
-
-# Build
-npm run build                 # Production build
-npm run lint                  # Run ESLint
-npm run type-check            # TypeScript check
-```
+- **JWT Strategy:** Session stored in cookies
 
 ---
 
 ## Environment Variables
 
 Required in `.env`:
-- `DATABASE_URL` - PostgreSQL connection string
-- `NEXTAUTH_URL` - App URL (http://localhost:3000 in dev)
-- `NEXTAUTH_SECRET` - Random secret for JWT
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET` - Google OAuth secret
+
+```bash
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5435/blog"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3001"
+NEXTAUTH_SECRET="your-secret-key-here"
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+# Email (Mailpit in dev)
+SMTP_HOST="localhost"
+SMTP_PORT="1025"
+SMTP_FROM="noreply@bookoflife.com"
+```
 
 ---
 
-## Feature Phases
+## Design System & Eye Comfort
 
-1. **Foundation** - Project setup, database, basic layout
-2. **Authentication** - NextAuth, login/register, Google OAuth
-3. **Blog Core** - Posts CRUD, rich text editor, images
-4. **Static Pages** - About, thoughts, contact
-5. **Engagement** - Comments, moderation, user profiles
-6. **Subscriptions** - Email subscriptions, newsletter, RSS
-7. **Polish** - Dark mode, search, analytics
+### Core Principle: Reader Comfort First
+
+**IMPORTANT:** This blog prioritizes eye comfort. Never use pure white (`#FFFFFF`) backgrounds for reading areas. Screens should feel warm and easy on the eyes, especially for long reading sessions.
+
+### Color Tokens
+
+All colors defined in `src/styles/design-tokens.ts` and mapped to Tailwind in `globals.css`.
+
+#### Light Mode (Warm, Not Harsh)
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--background` | `#FAF9F7` | Main page background (warm off-white) |
+| `--foreground` | `#1A1A1A` | Primary text (not pure black) |
+| `--accent` | `#2563EB` | Links, buttons, interactive |
+
+#### Dark Mode (True Dark, Not Pure Black)
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--background` | `#1C1C1E` | Main page background |
+| `--foreground` | `#F5F5F5` | Primary text |
+| `--accent` | `#60A5FA` | Links, buttons |
+
+### Design Rules
+
+1. **Never use `#FFFFFF`** - Always use `--background` token
+2. **Never use `#000000`** - Always use `--foreground` token
+3. **Contrast ratio** - Maintain WCAG AA (4.5:1 for text)
+4. **Reading width** - Max 65-75 characters per line (`max-w-prose`)
 
 ---
 
 ## Important Patterns
 
 ### Server Actions (Mutations)
+
 ```tsx
 // src/app/actions/posts.ts
 'use server'
@@ -164,25 +622,18 @@ export async function createPost(data: PostInput) {
 ```
 
 ### Data Fetching
+
 ```tsx
 // In Server Components
 const posts = await prisma.post.findMany({ where: { status: 'PUBLISHED' } })
 ```
 
 ### Form Handling
+
 ```tsx
 // Use React Hook Form + Zod
 const form = useForm<PostInput>({ resolver: zodResolver(postSchema) })
 ```
-
----
-
-## Open Decisions
-
-- [ ] Allow guest author submissions?
-- [ ] Multi-language support?
-- [ ] Anonymous comments or login required?
-- [ ] Analytics: Plausible, Umami, or custom?
 
 ---
 
@@ -196,9 +647,57 @@ const form = useForm<PostInput>({ resolver: zodResolver(postSchema) })
 
 ## Notes for Claude
 
+### Mandatory Requirements
+
+1. **Always write tests** - Every feature needs unit, integration, AND E2E tests
+2. **Test all user flows** - Happy paths, error states, edge cases
+3. **Follow test pyramid** - More unit tests, fewer E2E tests
+4. **Use Page Object Models** - For E2E test organization
+5. **Test accessibility** - Keyboard navigation, screen readers
+
+### Code Quality
+
 1. **Always use open source solutions** - No Azure, AWS paid services, or proprietary tools
 2. **Prefer simplicity** - Don't over-engineer; add complexity only when needed
 3. **TypeScript strict** - All code should be properly typed
 4. **Security first** - Validate all inputs, sanitize outputs, use parameterized queries
-5. **Follow Next.js 14+ patterns** - App Router, Server Components, Server Actions
-6. **Reference plan.md** - For detailed implementation phases and database schema
+5. **Follow Next.js 16+ patterns** - App Router, Server Components, Server Actions
+
+### Design & UX
+
+1. **Follow design system** - Use color tokens from design-tokens.ts, never raw hex values
+2. **Eye comfort priority** - No pure white/black backgrounds, warm tones for reading
+3. **Tailwind v4** - Uses `@theme` in globals.css, not tailwind.config.ts
+
+### Development
+
+1. **Port 3001** - App runs on port 3001 (not 3000) to avoid conflicts
+2. **Docker required** - Database runs in Docker container
+3. **Seed before testing** - Run `npm run test:seed` for E2E test data
+
+---
+
+## Test Commands Cheat Sheet
+
+```bash
+# Quick test run (fastest)
+npm test                                    # Unit tests
+npx playwright test --project=chromium      # E2E - Chromium only
+
+# Full test suite
+npm run test:e2e                            # All browsers
+
+# Debug tests
+npm test -- --watch                         # Unit - watch mode
+npx playwright test --ui                    # E2E - interactive mode
+npx playwright test --debug                 # E2E - step through
+
+# Coverage
+npm test -- --coverage                      # Unit test coverage
+npx playwright show-report                  # E2E test report
+
+# Specific tests
+npm test -- path/to/file                    # Run specific unit test
+npx playwright test e2e/auth.spec.ts        # Run specific E2E test
+npx playwright test -g "login"              # Run tests matching pattern
+```

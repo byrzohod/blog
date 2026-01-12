@@ -1,13 +1,30 @@
-# Build outputs
-bin/
-obj/
-dist/
-build/
-out/
-
 # Dependencies
 node_modules/
-packages/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build outputs
+/.next/
+/out/
+/build
+dist/
+
+# Testing
+/coverage
+TestResults/
+playwright-report/
+test-results/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
 
 # IDE
 .idea/
@@ -21,24 +38,29 @@ packages/
 .DS_Store
 Thumbs.db
 
-# Environment
-.env
-.env.local
-.env.*.local
-appsettings.Development.json
-appsettings.Local.json
-
-# Logs
-logs/
-*.log
+# Debug
 npm-debug.log*
-
-# Test coverage
-coverage/
-TestResults/
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 # Misc
+*.pem
 *.user
 *.suo
 *.cache
-.angular/
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Uploads (local dev)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal

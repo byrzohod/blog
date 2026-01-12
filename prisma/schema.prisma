@@ -1,0 +1,370 @@
+// Prisma Schema for Book of Life Blog
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Authentication Models (NextAuth.js compatible)
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?
+  role          Role      @default(SUBSCRIBER)
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Email verification
+  emailVerifyToken   String?   @unique
+  emailVerifyExpires DateTime?
+
+  // Notification preferences
+  notifyOnComment Boolean @default(true)
+  notifyOnReply   Boolean @default(true)
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  comments      Comment[]
+  media         Media[]
+  activityLogs  ActivityLog[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("password_reset_tokens")
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+  SUBSCRIBER
+}
+
+// ============================================================================
+// Blog Models
+// ============================================================================
+
+model Post {
+  id            String     @id @default(cuid())
+  title         String
+  slug          String     @unique
+  content       String     @db.Text
+  excerpt       String?    @db.Text
+  featuredImage String?
+  status        PostStatus @default(DRAFT)
+  publishedAt   DateTime?
+  readingTime   Int?
+  views         Int        @default(0)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  // Settings
+  allowComments Boolean @default(true)
+  isFeatured    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author     User        @relation(fields: [authorId], references: [id])
+  authorId   String
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  tags       Tag[]
+  comments   Comment[]
+  images     PostImage[]
+  pageViews  PageView[]
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+  @@map("posts")
+}
+
+model PostImage {
+  id      String  @id @default(cuid())
+  url     String
+  alt     String?
+  caption String?
+  order   Int     @default(0)
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@map("post_images")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  color       String?
+
+  posts Post[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  posts Post[]
+
+  @@map("tags")
+}
+
+// ============================================================================
+// Comments
+// ============================================================================
+
+model Comment {
+  id      String        @id @default(cuid())
+  content String        @db.Text
+  status  CommentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  post     Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  author   User    @relation(fields: [authorId], references: [id])
+  authorId String
+
+  // Threading
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId, status])
+  @@index([authorId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+  TRASH
+}
+
+// ============================================================================
+// Media
+// ============================================================================
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+
+  // URLs for different sizes
+  url          String
+  thumbnailUrl String?
+  smallUrl     String?
+  mediumUrl    String?
+  largeUrl     String?
+
+  alt     String?
+  caption String?
+
+  createdAt    DateTime @default(now())
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  uploadedById String
+
+  @@map("media")
+}
+
+// ============================================================================
+// Static Pages
+// ============================================================================
+
+model Page {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  content     String  @db.Text
+  excerpt     String?
+  isPublished Boolean @default(false)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pages")
+}
+
+// ============================================================================
+// Subscriptions
+// ============================================================================
+
+model Subscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  isVerified     Boolean   @default(false)
+  verifyToken    String?   @unique
+  subscribedAt   DateTime  @default(now())
+  verifiedAt     DateTime?
+  unsubscribedAt DateTime?
+
+  // Preferences
+  notifyNewPosts   Boolean @default(true)
+  notifyNewsletter Boolean @default(true)
+
+  @@map("subscribers")
+}
+
+model Newsletter {
+  id        String    @id @default(cuid())
+  subject   String
+  content   String    @db.Text
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("newsletters")
+}
+
+// ============================================================================
+// Activity Logging
+// ============================================================================
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String?
+  details    Json?
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@map("activity_logs")
+}
+
+// ============================================================================
+// Settings (Key-Value Store)
+// ============================================================================
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @db.Text
+
+  @@map("settings")
+}
+
+// ============================================================================
+// Analytics
+// ============================================================================
+
+model PageView {
+  id        String   @id @default(cuid())
+  postId    String?
+  path      String
+  referrer  String?
+  userAgent String?
+  sessionId String
+  createdAt DateTime @default(now())
+
+  post Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@index([postId])
+  @@index([createdAt])
+  @@index([path])
+  @@index([sessionId])
+  @@map("page_views")
+}
+
+// ============================================================================
+// Spam Filtering
+// ============================================================================
+
+model SpamWord {
+  id        String   @id @default(cuid())
+  word      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("spam_words")
+}

@@ -1,0 +1,427 @@
+@import 'tailwindcss';
+
+/*
+ * Design System: Sci-Fi Dark
+ * Deep space aesthetic with purple/cyan gradients
+ * Eye comfort with no harsh contrasts
+ */
+
+/* Theme definition for Tailwind v4 */
+@theme {
+  /* Sci-Fi Dark Colors */
+  --color-background: hsl(240 10% 4%);
+  --color-background-subtle: hsl(240 15% 8%);
+  --color-background-muted: hsl(240 12% 12%);
+
+  --color-foreground: hsl(0 0% 98%);
+  --color-foreground-muted: hsl(0 0% 70%);
+  --color-foreground-subtle: hsl(0 0% 50%);
+
+  --color-accent: hsl(258 89% 66%);
+  --color-accent-hover: hsl(258 89% 76%);
+  --color-accent-muted: hsl(258 50% 20%);
+
+  --color-border: hsl(240 10% 18%);
+
+  --color-success: hsl(142 71% 55%);
+  --color-warning: hsl(48 96% 53%);
+  --color-error: hsl(0 84% 60%);
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* Font families */
+  --font-sans: var(--font-inter, ui-sans-serif), system-ui, sans-serif;
+  --font-serif: var(--font-merriweather, Georgia), serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* CSS custom properties - Sci-Fi Dark Only */
+:root {
+  /* Deep space background */
+  --background: 240 10% 4%;
+  --background-subtle: 240 15% 8%;
+  --background-muted: 240 12% 12%;
+
+  /* Crisp white text */
+  --foreground: 0 0% 98%;
+  --foreground-muted: 0 0% 70%;
+  --foreground-subtle: 0 0% 50%;
+
+  /* Purple accent (primary) */
+  --accent: 258 89% 66%;
+  --accent-hover: 258 89% 76%;
+  --accent-muted: 258 50% 20%;
+
+  /* Cyan accent (secondary) */
+  --accent-cyan: 187 94% 43%;
+  --accent-cyan-hover: 187 94% 53%;
+  --accent-cyan-muted: 187 50% 20%;
+
+  /* Gradient stops */
+  --gradient-start: 258 89% 66%;
+  --gradient-end: 187 94% 43%;
+
+  /* Glow effects */
+  --glow-purple: 258 89% 66%;
+  --glow-cyan: 187 94% 43%;
+
+  /* Border */
+  --border: 240 10% 18%;
+
+  /* Status colors */
+  --success: 142 71% 55%;
+  --warning: 48 96% 53%;
+  --error: 0 84% 60%;
+
+  /* Card variants */
+  --card: 240 15% 8%;
+  --card-hover: 240 12% 12%;
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
+
+/* =====================================================
+   Sci-Fi Utility Classes
+   ===================================================== */
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--gradient-start) / 0.1), hsl(var(--gradient-end) / 0.1));
+}
+
+.gradient-bg-strong {
+  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
+}
+
+/* Glow effects */
+.glow-purple {
+  box-shadow: 0 0 20px hsl(var(--glow-purple) / 0.3),
+              0 0 40px hsl(var(--glow-purple) / 0.1);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px hsl(var(--glow-cyan) / 0.3),
+              0 0 40px hsl(var(--glow-cyan) / 0.1);
+}
+
+.glow-gradient {
+  box-shadow: 0 0 20px hsl(var(--glow-purple) / 0.2),
+              0 0 40px hsl(var(--glow-cyan) / 0.1);
+}
+
+/* Hover glow effect */
+.hover-glow {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 25px hsl(var(--glow-purple) / 0.25),
+              0 0 50px hsl(var(--glow-purple) / 0.1);
+  transform: translateY(-2px);
+}
+
+/* Gradient border */
+.gradient-border {
+  position: relative;
+  background: hsl(var(--card));
+  border-radius: 0.75rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Animated gradient border */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.gradient-border-animated::before {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    hsl(var(--gradient-start)),
+    hsl(var(--gradient-end)),
+    hsl(var(--gradient-start))
+  );
+  animation: rotate-gradient 3s linear infinite;
+}
+
+@keyframes rotate-gradient {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+/* Subtle star background (for hero sections) */
+.star-field {
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, hsl(0 0% 100% / 0.1), transparent),
+    radial-gradient(2px 2px at 40px 70px, hsl(0 0% 100% / 0.08), transparent),
+    radial-gradient(1px 1px at 90px 40px, hsl(0 0% 100% / 0.1), transparent),
+    radial-gradient(2px 2px at 130px 80px, hsl(0 0% 100% / 0.06), transparent),
+    radial-gradient(1px 1px at 160px 30px, hsl(0 0% 100% / 0.08), transparent);
+  background-size: 200px 100px;
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* =====================================================
+   Typography for blog content
+   ===================================================== */
+
+.blog-content {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  max-width: 65ch;
+}
+
+.blog-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.blog-content h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+
+.blog-content a {
+  color: hsl(var(--accent));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.blog-content a:hover {
+  color: hsl(var(--accent-hover));
+}
+
+.blog-content blockquote {
+  border-left: 4px solid hsl(var(--accent));
+  padding-left: 1.5rem;
+  font-style: italic;
+  color: hsl(var(--foreground-muted));
+  margin: 1.5rem 0;
+}
+
+.blog-content code {
+  background-color: hsl(var(--background-muted));
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.blog-content pre {
+  background-color: hsl(var(--background-subtle));
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid hsl(var(--border));
+}
+
+.blog-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+}
+
+.blog-content ul {
+  list-style-type: disc;
+}
+
+.blog-content ol {
+  list-style-type: decimal;
+}
+
+.blog-content hr {
+  margin: 2rem 0;
+  border-color: hsl(var(--border));
+}
+
+.blog-content img {
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.blog-content table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+
+.blog-content th,
+.blog-content td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.blog-content th {
+  background-color: hsl(var(--background-subtle));
+  font-weight: 600;
+}
+
+/* =====================================================
+   Container utilities
+   ===================================================== */
+
+.container-wide {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container-wide {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.container-prose {
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* =====================================================
+   Animations
+   ===================================================== */
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle pulse for important elements */
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Floating animation */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
