@@ -165,12 +165,13 @@ test.describe('Admin Media Library', () => {
       // Check for detail fields
       await expect(adminPage.getByText('Filename')).toBeVisible();
       await expect(adminPage.getByText('Dimensions')).toBeVisible();
-      await expect(adminPage.getByText('Size')).toBeVisible();
+      await expect(adminPage.getByText('Size', { exact: true })).toBeVisible();
     }
   });
 
-  test('should copy URL to clipboard', async ({ page, context }) => {
-    // Grant clipboard permissions
+  test('should copy URL to clipboard', async ({ adminPage }) => {
+    // Grant clipboard permissions using context from adminPage
+    const context = adminPage.context();
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
     await adminPage.goto('/admin/media');
@@ -249,13 +250,13 @@ test.describe('Admin Media Library', () => {
     await adminPage.goto('/admin/media');
     await adminPage.waitForLoadState('networkidle');
 
-    // Look for clickable media items (images or buttons)
-    const mediaItems = adminPage.locator('img').first();
-    const hasMedia = await mediaItems.isVisible().catch(() => false);
+    // Look for clickable media items using aspect-square containers
+    const mediaItems = adminPage.locator('[class*="aspect-square"]');
+    const count = await mediaItems.count();
 
-    if (hasMedia) {
-      // Click on first media item
-      await mediaItems.click();
+    if (count > 0) {
+      // Click on the container (force to bypass hover overlay)
+      await mediaItems.first().click({ force: true });
 
       // Check that dialog opens
       const dialog = adminPage.getByRole('dialog');

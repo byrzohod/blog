@@ -5,8 +5,10 @@ test.describe('Admin Subscribers', () => {
     test('should display subscribers page', async ({ adminPage }) => {
       await adminPage.goto('/admin/subscribers');
 
-      // Should have subscribers heading
-      await expect(adminPage.getByRole('heading', { name: 'Subscribers' })).toBeVisible();
+      await adminPage.waitForLoadState('networkidle');
+
+      // Should have subscribers heading (exact match to avoid matching "X Subscribers" card title)
+      await expect(adminPage.getByRole('heading', { name: 'Subscribers', exact: true })).toBeVisible();
     });
 
     test('should show subscriber count', async ({ adminPage }) => {
@@ -141,8 +143,8 @@ test.describe('Admin Subscribers', () => {
 
       await adminPage.waitForLoadState('networkidle');
 
-      // Admin should see subscribers page
-      await expect(adminPage.getByRole('heading', { name: 'Subscribers' })).toBeVisible();
+      // Admin should see subscribers page (exact match)
+      await expect(adminPage.getByRole('heading', { name: 'Subscribers', exact: true })).toBeVisible();
     });
 
     test('should redirect subscriber role away', async ({ subscriberPage }) => {

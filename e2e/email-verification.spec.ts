@@ -50,14 +50,22 @@ test.describe('Email Verification', () => {
   test.describe('Resend Verification Page', () => {
     test('should display resend verification form', async ({ page }) => {
       await page.goto('/resend-verification');
+      await page.waitForLoadState('networkidle');
 
-      await expect(page.getByRole('heading', { name: /resend verification/i })).toBeVisible();
+      // Wait for client component to hydrate
+      await page.waitForTimeout(1000);
+
+      await expect(page.getByRole('heading', { name: /resend verification/i })).toBeVisible({ timeout: 10000 });
       await expect(page.getByLabel('Email')).toBeVisible();
       await expect(page.getByRole('button', { name: /send verification email/i })).toBeVisible();
     });
 
     test('should validate email field', async ({ page }) => {
       await page.goto('/resend-verification');
+      await page.waitForLoadState('networkidle');
+
+      // Wait for client component to hydrate
+      await page.waitForTimeout(1000);
 
       // Submit empty form
       await page.getByRole('button', { name: /send verification email/i }).click();
@@ -68,6 +76,10 @@ test.describe('Email Verification', () => {
 
     test('should show success message after submitting', async ({ page }) => {
       await page.goto('/resend-verification');
+      await page.waitForLoadState('networkidle');
+
+      // Wait for client component to hydrate
+      await page.waitForTimeout(1000);
 
       // Fill email (doesn't matter if it exists or not - security)
       await page.getByLabel('Email').fill('test@example.com');
@@ -80,8 +92,13 @@ test.describe('Email Verification', () => {
 
     test('should have link back to login', async ({ page }) => {
       await page.goto('/resend-verification');
+      await page.waitForLoadState('networkidle');
 
-      await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
+      // Wait for client component to hydrate
+      await page.waitForTimeout(1000);
+
+      // Look for link with exact case to avoid matching header link
+      await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeVisible();
     });
   });
 

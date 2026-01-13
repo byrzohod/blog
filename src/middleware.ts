@@ -33,6 +33,7 @@ export default withAuth(
           pathname.startsWith('/register') ||
           pathname.startsWith('/forgot-password') ||
           pathname.startsWith('/reset-password') ||
+          pathname.startsWith('/resend-verification') ||
           pathname.startsWith('/api/auth') ||
           pathname.startsWith('/api/subscribe') ||
           pathname.startsWith('/api/contact') ||

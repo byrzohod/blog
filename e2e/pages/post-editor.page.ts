@@ -63,8 +63,19 @@ export class PostEditorPage {
   }
 
   async typeContent(content: string) {
+    // Click to focus the editor
     await this.contentEditor.click();
-    await this.page.keyboard.type(content);
+    // Type the content
+    await this.page.keyboard.type(content, { delay: 10 });
+    // Wait for Tiptap to process the input
+    await this.page.waitForTimeout(500);
+    // Dispatch input event to ensure React state updates
+    await this.contentEditor.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Small wait for state to propagate
+    await this.page.waitForTimeout(200);
   }
 
   async expectFeaturedImageUploadVisible() {

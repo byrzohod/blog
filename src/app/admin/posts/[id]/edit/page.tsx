@@ -62,6 +62,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     setError,
     reset,
     watch,
+    setValue,
   } = useForm<PostForm>({
     resolver: zodResolver(postSchema),
   });
@@ -141,6 +142,11 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     setCurrentStatus(status);
     setIsLoading(false);
     router.refresh();
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
+    setValue('content', newContent, { shouldValidate: true });
   };
 
   const handleDelete = async () => {
@@ -278,7 +284,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
                 <Label>Content</Label>
                 <TiptapEditor
                   content={content}
-                  onChange={setContent}
+                  onChange={handleContentChange}
                   placeholder="Start writing your post..."
                 />
                 {errors.content && (

@@ -60,6 +60,11 @@ export default function NewPostPage() {
     }
   };
 
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
+    setValue('content', newContent, { shouldValidate: true });
+  };
+
   const onSubmit = async (data: PostForm, status: 'DRAFT' | 'PUBLISHED') => {
     setIsLoading(true);
 
@@ -175,7 +180,7 @@ export default function NewPostPage() {
                 <Label>Content</Label>
                 <TiptapEditor
                   content={content}
-                  onChange={setContent}
+                  onChange={handleContentChange}
                   placeholder="Start writing your post..."
                 />
                 {errors.content && (

@@ -5,8 +5,10 @@ test.describe('Admin Comments', () => {
     test('should display comments page', async ({ adminPage }) => {
       await adminPage.goto('/admin/comments');
 
-      // Should have comments heading
-      await expect(adminPage.getByRole('heading', { name: 'Comments' })).toBeVisible();
+      await adminPage.waitForLoadState('networkidle');
+
+      // Should have comments heading (exact match to avoid matching "X Comments" card title)
+      await expect(adminPage.getByRole('heading', { name: 'Comments', exact: true })).toBeVisible();
     });
 
     test('should show status filter tabs', async ({ adminPage }) => {

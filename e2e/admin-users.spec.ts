@@ -7,8 +7,8 @@ test.describe('Admin Users', () => {
 
       await adminPage.waitForLoadState('networkidle');
 
-      // Should have users heading
-      await expect(adminPage.getByRole('heading', { name: 'Users' })).toBeVisible();
+      // Should have users heading (exact match to avoid matching "X Users" card title)
+      await expect(adminPage.getByRole('heading', { name: 'Users', exact: true })).toBeVisible();
     });
 
     test('should show role filter tabs', async ({ adminPage }) => {
@@ -105,8 +105,8 @@ test.describe('Admin Users', () => {
 
       await adminPage.waitForLoadState('networkidle');
 
-      // Admin should see the page
-      await expect(adminPage.getByRole('heading', { name: 'Users' })).toBeVisible();
+      // Admin should see the page (exact match)
+      await expect(adminPage.getByRole('heading', { name: 'Users', exact: true })).toBeVisible();
     });
 
     test('should redirect subscriber away from users page', async ({ subscriberPage }) => {

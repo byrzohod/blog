@@ -84,14 +84,18 @@ test.describe('Admin Posts', () => {
       const uniqueTitle = `Draft Post ${Date.now()}`;
 
       await editor.fillTitle(uniqueTitle);
+      // Trigger slug generation by blurring title
+      await editor.slugInput.click();
+      await adminPage.waitForTimeout(500);
+
       await editor.typeContent('This is the content of my draft post.');
+      // Wait for content to sync with React state
+      await adminPage.waitForTimeout(1000);
+
       await editor.saveDraft();
 
-      // Wait for save to complete and redirect
-      await adminPage.waitForTimeout(2000);
-
-      // Should redirect to posts list
-      await adminPage.waitForURL('/admin/posts', { timeout: 10000 });
+      // Wait for navigation - either redirect or check for success
+      await adminPage.waitForURL('**/admin/posts', { timeout: 20000 });
 
       // Verify post appears in list
       await expect(adminPage.getByText(uniqueTitle)).toBeVisible();
@@ -104,15 +108,19 @@ test.describe('Admin Posts', () => {
       const uniqueTitle = `Published Post ${Date.now()}`;
 
       await editor.fillTitle(uniqueTitle);
+      // Trigger slug generation by blurring title
+      await editor.slugInput.click();
+      await adminPage.waitForTimeout(500);
+
       await editor.fillExcerpt('A short excerpt for the post.');
       await editor.typeContent('This is a published post content.');
+      // Wait for content to sync with React state
+      await adminPage.waitForTimeout(1000);
+
       await editor.publish();
 
-      // Wait for publish to complete and redirect
-      await adminPage.waitForTimeout(2000);
-
-      // Should redirect to posts list
-      await adminPage.waitForURL('/admin/posts', { timeout: 10000 });
+      // Wait for navigation - either redirect or check for success
+      await adminPage.waitForURL('**/admin/posts', { timeout: 20000 });
 
       // Verify post appears in list
       await expect(adminPage.getByText(uniqueTitle)).toBeVisible();
@@ -151,9 +159,10 @@ test.describe('Admin Posts', () => {
 
       // Wait for page load
       await adminPage.waitForURL(/\/admin\/posts\/.+\/edit/);
+      await adminPage.waitForLoadState('networkidle');
 
-      // Title should be filled
-      const titleInput = adminPage.getByLabel('Title');
+      // Title should be filled (use exact to avoid matching Meta Title)
+      const titleInput = adminPage.getByLabel('Title', { exact: true });
       await expect(titleInput).not.toBeEmpty();
     });
 
@@ -164,17 +173,23 @@ test.describe('Admin Posts', () => {
 
       const originalTitle = `Post to Edit ${Date.now()}`;
       await editor.fillTitle(originalTitle);
+      // Trigger slug generation
+      await editor.slugInput.click();
+      await adminPage.waitForTimeout(500);
       await editor.typeContent('Content for editing test.');
+      // Wait for content to sync with React state
+      await adminPage.waitForTimeout(1000);
       await editor.saveDraft();
 
-      await adminPage.waitForURL('/admin/posts', { timeout: 5000 });
+      await adminPage.waitForURL('**/admin/posts', { timeout: 20000 });
 
       // Click on our post to edit it
       await adminPage.getByText(originalTitle).click();
       await adminPage.waitForURL(/\/admin\/posts\/.+\/edit/);
+      await adminPage.waitForLoadState('networkidle');
 
-      // Update the title
-      const titleInput = adminPage.getByLabel('Title');
+      // Update the title (use exact: true)
+      const titleInput = adminPage.getByLabel('Title', { exact: true });
       const updatedTitle = `${originalTitle} (Updated)`;
       await titleInput.fill(updatedTitle);
 
@@ -182,7 +197,7 @@ test.describe('Admin Posts', () => {
       await adminPage.getByRole('button', { name: /save draft/i }).click();
 
       // Wait for save
-      await adminPage.waitForTimeout(1000);
+      await adminPage.waitForTimeout(2000);
 
       // Go back to list and verify
       await adminPage.goto('/admin/posts');
@@ -212,14 +227,20 @@ test.describe('Admin Posts', () => {
 
       const uniqueTitle = `Post to Delete ${Date.now()}`;
       await editor.fillTitle(uniqueTitle);
+      // Trigger slug generation
+      await editor.slugInput.click();
+      await adminPage.waitForTimeout(500);
       await editor.typeContent('This post will be deleted.');
+      // Wait for content to sync with React state
+      await adminPage.waitForTimeout(1000);
       await editor.saveDraft();
 
-      await adminPage.waitForURL('/admin/posts', { timeout: 5000 });
+      await adminPage.waitForURL('**/admin/posts', { timeout: 20000 });
 
       // Find and click edit for our post
       await adminPage.getByText(uniqueTitle).click();
       await adminPage.waitForURL(/\/admin\/posts\/.+\/edit/);
+      await adminPage.waitForLoadState('networkidle');
 
       // Click delete button
       const deleteButton = adminPage.getByRole('button', { name: 'Delete' });
@@ -235,9 +256,10 @@ test.describe('Admin Posts', () => {
   test.describe('Author Permissions', () => {
     test('should allow author to create post', async ({ authorPage }) => {
       await authorPage.goto('/admin/posts/new');
+      await authorPage.waitForLoadState('networkidle');
 
-      // Author should be able to access new post page
-      await expect(authorPage.getByLabel('Title')).toBeVisible();
+      // Author should be able to access new post page (use exact: true)
+      await expect(authorPage.getByLabel('Title', { exact: true })).toBeVisible();
     });
 
     test('should allow author to create and view own post', async ({ authorPage }) => {
@@ -247,10 +269,15 @@ test.describe('Admin Posts', () => {
 
       const uniqueTitle = `Author Post ${Date.now()}`;
       await editor.fillTitle(uniqueTitle);
+      // Trigger slug generation
+      await editor.slugInput.click();
+      await authorPage.waitForTimeout(500);
       await editor.typeContent('Post created by author.');
+      // Wait for content to sync with React state
+      await authorPage.waitForTimeout(1000);
       await editor.saveDraft();
 
-      await authorPage.waitForURL('/admin/posts', { timeout: 5000 });
+      await authorPage.waitForURL('**/admin/posts', { timeout: 20000 });
 
       // Should be able to see it in the list
       await expect(authorPage.getByText(uniqueTitle)).toBeVisible();
