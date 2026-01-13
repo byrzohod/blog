@@ -9,26 +9,32 @@ test.describe('Admin Settings', () => {
       await expect(adminPage.getByRole('heading', { name: 'Settings' })).toBeVisible();
     });
 
-    test('should show site settings section', async ({ adminPage }) => {
+    test('should show general settings section', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
 
-      // Should have site settings card
-      await expect(adminPage.getByText('Site Settings')).toBeVisible();
+      await adminPage.waitForLoadState('networkidle');
+
+      // Should have General settings card
+      await expect(adminPage.getByText('General')).toBeVisible();
     });
 
-    test('should display site name field', async ({ adminPage }) => {
+    test('should display site title field', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
 
-      // Should have site name input
-      const siteNameLabel = adminPage.getByLabel(/site name|site title/i);
-      await expect(siteNameLabel).toBeVisible();
+      await adminPage.waitForLoadState('networkidle');
+
+      // Should have site title input
+      const siteTitleField = adminPage.getByLabel('Site Title');
+      await expect(siteTitleField).toBeVisible();
     });
 
     test('should display site description field', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
 
+      await adminPage.waitForLoadState('networkidle');
+
       // Should have site description textarea
-      const descriptionField = adminPage.getByLabel(/site description|description/i);
+      const descriptionField = adminPage.getByLabel('Site Description');
       await expect(descriptionField).toBeVisible();
     });
   });
@@ -37,13 +43,17 @@ test.describe('Admin Settings', () => {
     test('should have contact email field', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
 
+      await adminPage.waitForLoadState('networkidle');
+
       // Should have contact email input
-      const emailField = adminPage.getByLabel(/contact email|admin email/i);
+      const emailField = adminPage.getByLabel('Contact Email');
       await expect(emailField).toBeVisible();
     });
 
     test('should have save button', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
+
+      await adminPage.waitForLoadState('networkidle');
 
       // Should have save button
       const saveButton = adminPage.getByRole('button', { name: /save/i });
@@ -53,25 +63,20 @@ test.describe('Admin Settings', () => {
     test('should update settings', async ({ adminPage }) => {
       await adminPage.goto('/admin/settings');
 
-      // Get the site name field
-      const siteNameField = adminPage.getByLabel(/site name|site title/i);
+      await adminPage.waitForLoadState('networkidle');
+
+      // Get the site title field
+      const siteTitleField = adminPage.getByLabel('Site Title');
 
       // Clear and enter new value
       const testValue = `Test Site ${Date.now()}`;
-      await siteNameField.fill(testValue);
+      await siteTitleField.fill(testValue);
 
       // Click save
       await adminPage.getByRole('button', { name: /save/i }).click();
 
-      // Wait for save operation
-      await adminPage.waitForTimeout(1000);
-
-      // Check for success message or value persistence
-      // After reload, value should persist
-      await adminPage.goto('/admin/settings');
-
-      // Note: depending on implementation, the value may or may not persist
-      // This test validates the form can be submitted
+      // Wait for success message
+      await expect(adminPage.getByText(/saved successfully/i)).toBeVisible({ timeout: 5000 });
     });
   });
 

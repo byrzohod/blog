@@ -14,27 +14,24 @@ test.describe('Admin Subscribers', () => {
 
       await adminPage.waitForLoadState('networkidle');
 
-      // Should show total count or "showing X of Y"
-      const countText = adminPage.getByText(/showing|total|subscriber/i);
-      await expect(countText.first()).toBeVisible();
+      // Should show total count in card header
+      const countText = adminPage.getByText(/\d+ Subscribers/);
+      await expect(countText).toBeVisible();
     });
 
-    test('should display subscriber table', async ({ adminPage }) => {
+    test('should display subscriber list or empty state', async ({ adminPage }) => {
       await adminPage.goto('/admin/subscribers');
 
       await adminPage.waitForLoadState('networkidle');
 
-      // Should have a table
-      const table = adminPage.locator('table');
-      const hasTable = await table.isVisible().catch(() => false);
+      // Should have Email header column or empty state
+      const emailHeader = adminPage.getByText('Email').first();
+      const emptyState = adminPage.getByText(/no subscribers yet/i);
 
-      if (hasTable) {
-        // Table should have email column
-        await expect(adminPage.getByText('Email')).toBeVisible();
-      } else {
-        // Or show empty state
-        await expect(adminPage.getByText(/no subscribers/i)).toBeVisible();
-      }
+      const hasEmail = await emailHeader.isVisible().catch(() => false);
+      const isEmpty = await emptyState.isVisible().catch(() => false);
+
+      expect(hasEmail || isEmpty).toBe(true);
     });
   });
 
@@ -141,6 +138,8 @@ test.describe('Admin Subscribers', () => {
   test.describe('Access Control', () => {
     test('should allow admin access', async ({ adminPage }) => {
       await adminPage.goto('/admin/subscribers');
+
+      await adminPage.waitForLoadState('networkidle');
 
       // Admin should see subscribers page
       await expect(adminPage.getByRole('heading', { name: 'Subscribers' })).toBeVisible();

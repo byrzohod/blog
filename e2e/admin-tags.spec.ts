@@ -152,24 +152,25 @@ test.describe('Admin Tags', () => {
       const tagName = `tagdelete${Date.now()}`;
 
       await adminPage.getByRole('button', { name: /new tag/i }).click();
-      await adminPage.getByLabel('Name').fill(tagName);
+      await adminPage.getByLabel('Name').first().fill(tagName);
       await adminPage.waitForTimeout(300);
       await adminPage.getByRole('button', { name: 'Save' }).click();
       await adminPage.waitForTimeout(1000);
 
       // Reload page
       await adminPage.goto('/admin/tags');
+      await adminPage.waitForLoadState('networkidle');
 
-      // Find the tag we created - it's displayed as "#tagName"
-      const tagContainer = adminPage.locator(`.rounded-lg.bg-background-subtle:has-text("#${tagName}")`);
+      // Find the tag row containing our tag name
+      const tagText = adminPage.getByText(`#${tagName}`);
+      const tagRow = tagText.locator('xpath=ancestor::div[contains(@class, "rounded-lg")]').first();
 
-      // Click the delete button (last button - Trash icon)
-      const deleteButton = tagContainer.getByRole('button').last();
+      // Click the delete button (last button with trash icon)
+      const deleteButton = tagRow.locator('button').last();
       await deleteButton.click();
 
-      // Confirm deletion in dialog (the destructive Delete button in the dialog)
-      const confirmButton = adminPage.getByRole('button', { name: 'Delete' });
-      await confirmButton.click();
+      // Confirm deletion in dialog
+      await adminPage.getByRole('button', { name: 'Delete' }).click();
 
       await adminPage.waitForTimeout(1000);
 

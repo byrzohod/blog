@@ -129,15 +129,15 @@ test.describe('Admin Posts', () => {
       await expect(editor.first()).toBeVisible();
     });
 
-    test('should have featured image field', async ({ adminPage }) => {
+    test('should have featured image upload', async ({ adminPage }) => {
       await adminPage.goto('/admin/posts/new');
 
       // Wait for page to hydrate (client component)
       await adminPage.waitForTimeout(1000);
 
-      // Featured image uses "Image URL" label
-      const imageInput = adminPage.getByLabel('Image URL');
-      await expect(imageInput).toBeVisible();
+      // Featured image now uses an upload component with drag-and-drop
+      const imageUpload = adminPage.getByText(/drag.*drop|click.*upload/i).first();
+      await expect(imageUpload).toBeVisible();
     });
   });
 

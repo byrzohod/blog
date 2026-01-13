@@ -141,18 +141,21 @@ test.describe('Admin Image Upload', () => {
     test('should auto-generate slug from title on blur', async ({ adminPage }) => {
       await adminPage.goto('/admin/posts/new');
 
-      // Fill in title
-      const titleInput = adminPage.getByLabel(/title/i);
+      // Wait for page to hydrate
+      await adminPage.waitForTimeout(1000);
+
+      // Fill in title (use exact match to avoid "Meta Title")
+      const titleInput = adminPage.getByLabel('Title', { exact: true });
       await titleInput.fill('My Test Blog Post Title');
 
-      // Blur the title field to trigger slug generation
-      await titleInput.blur();
+      // Click on slug field to trigger blur on title
+      const slugInput = adminPage.getByLabel('Slug');
+      await slugInput.click();
 
       // Wait for slug generation
       await adminPage.waitForTimeout(500);
 
       // Slug field should have generated value
-      const slugInput = adminPage.getByLabel(/slug/i);
       const slugValue = await slugInput.inputValue();
 
       // Slug should be URL-friendly version of title

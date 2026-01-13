@@ -6,7 +6,8 @@ export class PostEditorPage {
   readonly slugInput: Locator;
   readonly excerptInput: Locator;
   readonly contentEditor: Locator;
-  readonly featuredImageInput: Locator;
+  readonly featuredImageUpload: Locator;
+  readonly mediaLibraryButton: Locator;
   readonly categorySelect: Locator;
   readonly saveDraftButton: Locator;
   readonly publishButton: Locator;
@@ -21,7 +22,9 @@ export class PostEditorPage {
     this.slugInput = page.getByLabel('Slug');
     this.excerptInput = page.getByLabel('Excerpt');
     this.contentEditor = page.locator('.ProseMirror, [contenteditable="true"]').first();
-    this.featuredImageInput = page.getByLabel('Image URL');
+    // Image upload is now a drag-and-drop component
+    this.featuredImageUpload = page.getByText(/drag.*drop|click.*upload/i).first();
+    this.mediaLibraryButton = page.getByRole('button', { name: /media library|browse/i });
     this.categorySelect = page.getByLabel('Category');
     this.saveDraftButton = page.getByRole('button', { name: /save draft/i });
     this.publishButton = page.getByRole('button', { name: /publish/i });
@@ -64,8 +67,9 @@ export class PostEditorPage {
     await this.page.keyboard.type(content);
   }
 
-  async setFeaturedImage(url: string) {
-    await this.featuredImageInput.fill(url);
+  async expectFeaturedImageUploadVisible() {
+    // Featured image is now an upload component, not a URL input
+    await expect(this.featuredImageUpload).toBeVisible();
   }
 
   async selectCategory(categoryName: string) {
