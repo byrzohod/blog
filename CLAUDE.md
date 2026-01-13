@@ -562,33 +562,115 @@ Add to `.vscode/launch.json`:
 
 ## Required Skills
 
-### Core Development Skills
+### Core Framework & Language
 
-| Skill | Usage | Learn More |
-|-------|-------|------------|
-| TypeScript | All code | typescriptlang.org |
-| React 19 | UI components | react.dev |
-| Next.js 16 (App Router) | Framework | nextjs.org/docs |
-| Tailwind CSS v4 | Styling | tailwindcss.com |
-| Prisma | Database ORM | prisma.io/docs |
-| NextAuth.js | Authentication | authjs.dev |
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| TypeScript | All code, strict mode | Essential | typescriptlang.org |
+| React 19 | UI components, hooks, state | Essential | react.dev |
+| Next.js 16 (App Router) | Framework, routing, SSR/SSG | Essential | nextjs.org/docs |
+| Server Components | Default rendering strategy | Essential | nextjs.org/docs/app |
+| Server Actions | Form mutations, data updates | Essential | nextjs.org/docs/app/api-reference/functions/server-actions |
 
-### Testing Skills
+### Styling & UI Components
 
-| Skill | Usage | Learn More |
-|-------|-------|------------|
-| Vitest | Unit/integration tests | vitest.dev |
-| Testing Library | Component testing | testing-library.com |
-| Playwright | E2E testing | playwright.dev |
-| Page Object Model | Test organization | playwright.dev/docs/pom |
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| Tailwind CSS v4 | All styling, responsive design | Essential | tailwindcss.com |
+| CSS Custom Properties | Design tokens, theming | Important | developer.mozilla.org |
+| shadcn/ui | Pre-built accessible components | Important | ui.shadcn.com |
+| Radix UI Primitives | Underlying component library | Good to know | radix-ui.com |
+| Lucide Icons | Icon library | Good to know | lucide.dev |
 
-### DevOps Skills
+### Forms & Validation
 
-| Skill | Usage | Learn More |
-|-------|-------|------------|
-| Docker | Local database | docs.docker.com |
-| Git | Version control | git-scm.com |
-| GitHub Actions | CI/CD (planned) | docs.github.com/actions |
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| React Hook Form | Form state management | Essential | react-hook-form.com |
+| Zod | Schema validation, type inference | Essential | zod.dev |
+| Form-Zod Integration | zodResolver for validation | Important | github.com/react-hook-form/resolvers |
+
+### Rich Text & Media
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| Tiptap | Rich text editor for posts | Important | tiptap.dev |
+| ProseMirror | Underlying editor framework | Good to know | prosemirror.net |
+| Sharp | Image processing, optimization | Good to know | sharp.pixelplumbing.com |
+
+### Database & ORM
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| PostgreSQL | Database | Essential | postgresql.org |
+| Prisma | ORM, migrations, queries | Essential | prisma.io/docs |
+| Prisma Schema | Data modeling | Essential | prisma.io/docs/concepts/components/prisma-schema |
+| Database Relations | One-to-many, many-to-many | Important | prisma.io/docs/concepts/components/prisma-schema/relations |
+
+### Authentication & Security
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| NextAuth.js v5 | Authentication framework | Essential | authjs.dev |
+| JWT Strategy | Session management | Important | jwt.io |
+| bcrypt | Password hashing | Important | github.com/kelektiv/node.bcrypt.js |
+| Middleware | Route protection | Important | nextjs.org/docs/app/building-your-application/routing/middleware |
+| CSRF Protection | Security | Good to know | owasp.org |
+
+### Testing (Critical)
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| Vitest | Unit & integration tests | Essential | vitest.dev |
+| Testing Library | Component testing | Essential | testing-library.com |
+| Playwright | E2E browser testing | Essential | playwright.dev |
+| Page Object Model | Test organization pattern | Important | playwright.dev/docs/pom |
+| Test Fixtures | Auth & data setup | Important | playwright.dev/docs/test-fixtures |
+| Locator Strategies | Element selection | Important | playwright.dev/docs/locators |
+| Assertions | expect, toBeVisible, etc. | Essential | playwright.dev/docs/test-assertions |
+
+### DevOps & Tooling
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| Docker & Compose | Local PostgreSQL, Mailpit | Essential | docs.docker.com |
+| Git | Version control | Essential | git-scm.com |
+| npm/pnpm | Package management | Essential | docs.npmjs.com |
+| ESLint | Code linting | Important | eslint.org |
+| Prettier | Code formatting | Good to know | prettier.io |
+| GitHub Actions | CI/CD (planned) | Future | docs.github.com/actions |
+
+### Email & Notifications
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| Nodemailer | Email sending | Important | nodemailer.com |
+| SMTP | Email protocol | Good to know | - |
+| Mailpit | Local email testing | Important | mailpit.axllent.org |
+
+### API & Data Fetching
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| REST APIs | API route handlers | Important | nextjs.org/docs/app/building-your-application/routing/route-handlers |
+| Fetch API | Data fetching | Essential | developer.mozilla.org |
+| Error Handling | Try/catch, error boundaries | Important | react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary |
+
+### Accessibility (A11y)
+
+| Skill | Usage | Priority | Learn More |
+|-------|-------|----------|------------|
+| ARIA Attributes | Screen reader support | Important | developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA |
+| Semantic HTML | Proper element usage | Important | developer.mozilla.org |
+| Keyboard Navigation | Focus management | Important | w3.org/WAI/ARIA/apg/ |
+| WCAG Guidelines | Contrast, readability | Good to know | w3.org/WAI/WCAG21/quickref/ |
+
+### Skill Priority Legend
+
+- **Essential**: Must know to work on this project
+- **Important**: Frequently used, should understand well
+- **Good to know**: Helpful but can learn as needed
+- **Future**: Planned features, not yet implemented
 
 ---
 
