@@ -59,13 +59,18 @@ This file contains essential context about the blog project that should be under
 - **Protected Routes** - Middleware-based route protection
 
 ### Admin Features
-- **Dashboard** - Stats overview (posts, comments, subscribers)
-- **Post Management** - Create, edit, delete posts with rich text editor
-- **Category Management** - CRUD for categories with slug generation
+- **Dashboard** - Stats overview (posts, comments, subscribers, views)
+- **Post Management** - Create, edit, delete posts with Tiptap rich text editor
+- **Category Management** - CRUD for categories with slug generation and color coding
 - **Tag Management** - CRUD for tags with association tracking
-- **Comment Moderation** - Approve, reject, delete comments
-- **User Management** - View and manage users
-- **Media Library** - Upload and manage images
+- **Comment Moderation** - Approve, reject, delete comments with filtering
+- **User Management** - View, edit roles, and manage users
+- **Media Library** - Upload, manage, and organize images with metadata
+- **Image Upload** - Direct image upload with drag-and-drop support
+- **Subscriber Management** - View and manage newsletter subscribers
+- **Activity Log** - Track all admin actions with filtering by entity/action type
+- **Analytics** - View post views, popular content, and traffic statistics
+- **Settings** - Site configuration and preferences
 
 ### Accessibility Features
 - **Skip Links** - Skip to main content
@@ -207,8 +212,8 @@ import { test, expect } from '@playwright/test';
 
 test('should login with valid credentials', async ({ page }) => {
   await page.goto('/login');
-  await page.getByLabel('Email').fill('admin@bookoflife.com');
-  await page.getByLabel('Password').fill('admin123');
+  await page.getByLabel('Email').fill('admin@test.com');
+  await page.getByLabel('Password').fill('TestPassword123!');
   await page.getByRole('button', { name: 'Sign In' }).click();
   await expect(page).toHaveURL('/');
 });
@@ -237,22 +242,31 @@ When implementing any new feature:
 
 ## E2E Test Suites
 
-Current E2E test coverage (185 tests across 5 browsers):
+Current E2E test coverage (248 tests per browser, 1240 total across 5 browsers):
 
-| Suite | Tests | Description |
-|-------|-------|-------------|
-| `home.spec.ts` | 17 | Homepage, navigation, theme toggle |
-| `auth.spec.ts` | 14 | Login, register, logout, protected routes |
-| `blog.spec.ts` | 14 | Blog listing, categories, tags, posts |
-| `search.spec.ts` | 5 | Search functionality |
-| `subscription.spec.ts` | 8 | Email subscription, RSS, JSON feed |
-| `contact.spec.ts` | 5 | Contact form |
-| `password-reset.spec.ts` | 10 | Password reset flow |
-| `admin-dashboard.spec.ts` | 8 | Admin dashboard and navigation |
-| `admin-posts.spec.ts` | 14 | Post CRUD operations |
-| `admin-categories.spec.ts` | 9 | Category management |
-| `admin-tags.spec.ts` | 10 | Tag management |
-| `accessibility.spec.ts` | 18 | Skip links, landmarks, keyboard nav |
+| Suite | Description |
+|-------|-------------|
+| `home.spec.ts` | Homepage, navigation, theme toggle |
+| `auth.spec.ts` | Login, register, logout, protected routes |
+| `blog.spec.ts` | Blog listing, categories, tags, posts |
+| `search.spec.ts` | Search functionality |
+| `subscription.spec.ts` | Email subscription, RSS, JSON feed |
+| `contact.spec.ts` | Contact form validation and submission |
+| `password-reset.spec.ts` | Password reset flow with email |
+| `email-verification.spec.ts` | Email verification and resend flow |
+| `admin-dashboard.spec.ts` | Admin dashboard and navigation |
+| `admin-posts.spec.ts` | Post CRUD with rich text editor |
+| `admin-categories.spec.ts` | Category management |
+| `admin-tags.spec.ts` | Tag management |
+| `admin-comments.spec.ts` | Comment moderation |
+| `admin-users.spec.ts` | User management and roles |
+| `admin-subscribers.spec.ts` | Subscriber management |
+| `admin-media.spec.ts` | Media library operations |
+| `admin-image-upload.spec.ts` | Image upload functionality |
+| `admin-activity.spec.ts` | Activity log and filtering |
+| `admin-analytics.spec.ts` | Analytics dashboard |
+| `admin-settings.spec.ts` | Site settings |
+| `accessibility.spec.ts` | Skip links, landmarks, keyboard nav |
 
 ### E2E Test Patterns
 
@@ -282,6 +296,90 @@ export const test = base.extend<{ adminPage: Page }>({
   },
 });
 ```
+
+### E2E Test Writing Best Practices
+
+**IMPORTANT:** Follow these patterns to avoid flaky tests:
+
+#### 1. Use Exact Matchers to Avoid Strict Mode Violations
+
+```typescript
+// BAD - matches multiple elements
+await page.getByRole('heading', { name: 'Users' }).click();
+await page.getByRole('button', { name: /next/i }).click();
+
+// GOOD - exact match prevents ambiguity
+await page.getByRole('heading', { name: 'Users', exact: true }).click();
+await page.getByRole('button', { name: 'Next', exact: true }).click();
+```
+
+#### 2. Wait for Client Hydration in Client Components
+
+```typescript
+// For pages with 'use client' components
+await page.goto('/resend-verification');
+await page.waitForLoadState('networkidle');
+await page.waitForTimeout(1000);  // Wait for React hydration
+await expect(page.getByRole('heading')).toBeVisible({ timeout: 10000 });
+```
+
+#### 3. Use Auth Fixture Correctly
+
+```typescript
+// BAD - page and context not available with auth fixture
+test('clipboard test', async ({ page, context }) => {  // WRONG!
+  await context.grantPermissions(['clipboard-read']);
+});
+
+// GOOD - use adminPage from fixture, get context from it
+test('clipboard test', async ({ adminPage }) => {
+  const context = adminPage.context();
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+});
+```
+
+#### 4. Handle Dynamic Content with Proper Waits
+
+```typescript
+// BAD - brittle timeout
+await page.waitForTimeout(5000);
+
+// GOOD - wait for specific element or condition
+await expect(page.getByText('Success')).toBeVisible({ timeout: 10000 });
+await page.waitForLoadState('networkidle');
+```
+
+#### 5. Force Click for Hidden Interactive Elements
+
+```typescript
+// When element appears on hover
+await mediaCard.locator('button[title="View details"]').click({ force: true });
+```
+
+### Common Pitfalls and Solutions
+
+| Problem | Solution |
+|---------|----------|
+| "Strict mode violation" - multiple elements match | Add `{ exact: true }` to selector |
+| Test passes locally, fails in CI | Add explicit waits for hydration and network |
+| "adminPage is undefined" | Use `{ adminPage }` fixture, not `{ page, context }` |
+| Form validation fails silently | Ensure form state syncs with UI (see TiptapEditor issue below) |
+| Element not clickable | Use `{ force: true }` or wait for visibility first |
+| Button name matches dev tools | Use exact match: `{ name: 'Next', exact: true }` |
+
+### Known Application Issues (Fixed)
+
+**TiptapEditor Content Sync:** The TiptapEditor component must sync content with React Hook Form:
+
+```typescript
+// In post editor pages, content changes must call both:
+const handleContentChange = (newContent: string) => {
+  setContent(newContent);  // Local state
+  setValue('content', newContent, { shouldValidate: true });  // Form state
+};
+```
+
+Without this, form validation shows "Content is required" even when content is visible.
 
 ---
 
@@ -321,13 +419,15 @@ npm run dev
 | Mailpit SMTP | 1025 | localhost:1025 |
 | Mailpit UI | 8025 | http://localhost:8025 |
 
-### Admin Credentials (After Seeding)
+### Test Credentials (After `npm run test:seed`)
 
-| Field | Value |
-|-------|-------|
-| Email | admin@bookoflife.com |
-| Password | admin123 |
-| Role | ADMIN |
+| Role | Email | Password |
+|------|-------|----------|
+| ADMIN | admin@test.com | TestPassword123! |
+| AUTHOR | author@test.com | TestPassword123! |
+| SUBSCRIBER | subscriber@test.com | TestPassword123! |
+
+**Note:** For production seed (`npx prisma db seed`), use admin@bookoflife.com / admin123
 
 ---
 
@@ -530,13 +630,18 @@ Add to `.vscode/launch.json`:
 |-------|---------|
 | User | Authentication, roles (ADMIN, AUTHOR, SUBSCRIBER) |
 | Post | Blog posts with draft/published status |
-| Category | Post categorization |
+| PostImage | Post featured images and gallery |
+| Category | Post categorization with colors |
 | Tag | Post tagging (many-to-many) |
-| Comment | User comments with moderation |
+| Comment | User comments with moderation status |
 | Subscriber | Email newsletter subscribers |
 | Page | Static pages (about, contact) |
-| Media | Uploaded files tracking |
-| PasswordResetToken | Password reset flow |
+| Media | Uploaded files tracking with metadata |
+| PasswordResetToken | Password reset flow tokens |
+| VerificationToken | Email verification tokens |
+| ActivityLog | Admin action audit trail |
+| Session | User sessions (NextAuth) |
+| Account | OAuth account linking (NextAuth) |
 
 ---
 
@@ -675,6 +780,29 @@ const form = useForm<PostInput>({ resolver: zodResolver(postSchema) })
 2. **Docker required** - Database runs in Docker container
 3. **Seed before testing** - Run `npm run test:seed` for E2E test data
 
+### Middleware Public Routes
+
+When adding new public pages, update `src/middleware.ts` to allow unauthenticated access:
+
+```typescript
+// Current public routes in middleware:
+pathname.startsWith('/login') ||
+pathname.startsWith('/register') ||
+pathname.startsWith('/forgot-password') ||
+pathname.startsWith('/reset-password') ||
+pathname.startsWith('/resend-verification') ||  // Don't forget this one!
+pathname.startsWith('/api/auth') ||
+// ... etc
+```
+
+### E2E Test Gotchas
+
+1. **Use test credentials** - `admin@test.com` / `TestPassword123!` (not production creds)
+2. **Auth fixture provides `adminPage`** - Not `page` or `context`
+3. **Use exact matchers** - Add `{ exact: true }` to avoid matching multiple elements
+4. **Wait for hydration** - Client components need extra wait time after navigation
+5. **TiptapEditor sync** - Content must sync to form state with `setValue()`
+
 ---
 
 ## Test Commands Cheat Sheet
@@ -682,15 +810,16 @@ const form = useForm<PostInput>({ resolver: zodResolver(postSchema) })
 ```bash
 # Quick test run (fastest)
 npm test                                    # Unit tests
-npx playwright test --project=chromium      # E2E - Chromium only
+npx playwright test --project=chromium      # E2E - Chromium only (fastest)
 
 # Full test suite
-npm run test:e2e                            # All browsers
+npm run test:e2e                            # All 5 browsers (248 tests each)
 
 # Debug tests
 npm test -- --watch                         # Unit - watch mode
 npx playwright test --ui                    # E2E - interactive mode
 npx playwright test --debug                 # E2E - step through
+PWDEBUG=1 npx playwright test               # E2E - with inspector
 
 # Coverage
 npm test -- --coverage                      # Unit test coverage
@@ -700,4 +829,14 @@ npx playwright show-report                  # E2E test report
 npm test -- path/to/file                    # Run specific unit test
 npx playwright test e2e/auth.spec.ts        # Run specific E2E test
 npx playwright test -g "login"              # Run tests matching pattern
+npx playwright test e2e/admin-posts.spec.ts --project=chromium  # Single file, single browser
+
+# Before running E2E tests
+npm run test:seed                           # Reset DB with test data
+docker compose up -d                        # Ensure services running
+npm run dev                                 # Start dev server (port 3001)
+
+# Useful for debugging failures
+npx playwright test --trace on              # Capture trace for failures
+npx playwright show-trace trace.zip         # View trace file
 ```
