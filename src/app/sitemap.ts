@@ -1,16 +1,16 @@
-import { MetadataRoute } from 'next';
-import { prisma } from '@/lib/db';
+import { MetadataRoute } from "next";
+import { prisma } from "@/lib/db";
 
 // Force dynamic generation to avoid build-time database access
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3001';
+  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3001";
 
   // Get all published posts
   const posts = await prisma.post.findMany({
     where: {
-      status: 'PUBLISHED',
+      status: "PUBLISHED",
       publishedAt: {
         lte: new Date(),
       },
@@ -40,38 +40,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/subscribe`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/archive`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.5,
     },
   ];
 
@@ -79,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.updatedAt,
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
@@ -87,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
     url: `${baseUrl}/blog/category/${category.slug}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
@@ -95,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tagPages: MetadataRoute.Sitemap = tags.map((tag) => ({
     url: `${baseUrl}/blog/tag/${tag.slug}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 0.5,
   }));
 

@@ -1,5 +1,5 @@
-import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
@@ -7,9 +7,11 @@ export default withAuth(
     const token = req.nextauth.token;
 
     // Admin routes require ADMIN role
-    if (pathname.startsWith('/admin')) {
-      if (!token || (token.role !== 'ADMIN' && token.role !== 'AUTHOR')) {
-        return NextResponse.redirect(new URL('/login?error=unauthorized', req.url));
+    if (pathname.startsWith("/admin")) {
+      if (!token || (token.role !== "ADMIN" && token.role !== "AUTHOR")) {
+        return NextResponse.redirect(
+          new URL("/login?error=unauthorized", req.url),
+        );
       }
     }
 
@@ -22,27 +24,20 @@ export default withAuth(
 
         // Public routes
         if (
-          pathname === '/' ||
-          pathname.startsWith('/blog') ||
-          pathname.startsWith('/about') ||
-          pathname.startsWith('/contact') ||
-          pathname.startsWith('/subscribe') ||
-          pathname.startsWith('/archive') ||
-          pathname.startsWith('/search') ||
-          pathname.startsWith('/login') ||
-          pathname.startsWith('/register') ||
-          pathname.startsWith('/forgot-password') ||
-          pathname.startsWith('/reset-password') ||
-          pathname.startsWith('/resend-verification') ||
-          pathname.startsWith('/api/auth') ||
-          pathname.startsWith('/api/subscribe') ||
-          pathname.startsWith('/api/contact') ||
-          pathname.startsWith('/_next') ||
-          pathname.startsWith('/favicon') ||
-          pathname.startsWith('/feed') ||
-          pathname.endsWith('.xml') ||
-          pathname.endsWith('.txt') ||
-          pathname.endsWith('.json')
+          pathname === "/" ||
+          pathname.startsWith("/blog") ||
+          pathname.startsWith("/login") ||
+          pathname.startsWith("/register") ||
+          pathname.startsWith("/forgot-password") ||
+          pathname.startsWith("/reset-password") ||
+          pathname.startsWith("/resend-verification") ||
+          pathname.startsWith("/api/auth") ||
+          pathname.startsWith("/_next") ||
+          pathname.startsWith("/favicon") ||
+          pathname.startsWith("/feed") ||
+          pathname.endsWith(".xml") ||
+          pathname.endsWith(".txt") ||
+          pathname.endsWith(".json")
         ) {
           return true;
         }
@@ -51,7 +46,7 @@ export default withAuth(
         return !!token;
       },
     },
-  }
+  },
 );
 
 export const config = {
@@ -63,6 +58,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
   ],
 };

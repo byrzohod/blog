@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { Home, Search, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { Home, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -23,12 +23,6 @@ export default function NotFound() {
             <Link href="/blog">
               <ArrowLeft className="h-4 w-4 mr-2" />
               View Blog
-            </Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/search">
-              <Search className="h-4 w-4 mr-2" />
-              Search
             </Link>
           </Button>
         </div>

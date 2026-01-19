@@ -1,18 +1,17 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
-import { prisma } from '@/lib/db';
-import { formatDate, calculateReadingTime } from '@/lib/utils';
-import { getRelatedPosts } from '@/lib/related-posts';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { RelatedPosts } from '@/components/blog/related-posts';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
+import { prisma } from "@/lib/db";
+import { formatDate, calculateReadingTime } from "@/lib/utils";
+import { getRelatedPosts } from "@/lib/related-posts";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { RelatedPosts } from "@/components/blog/related-posts";
 
 // Force dynamic generation to avoid build-time database access
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -22,7 +21,7 @@ async function getPost(slug: string) {
   return prisma.post.findUnique({
     where: {
       slug,
-      status: 'PUBLISHED',
+      status: "PUBLISHED",
       publishedAt: {
         lte: new Date(),
       },
@@ -51,14 +50,13 @@ async function getPost(slug: string) {
   });
 }
 
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
 
   if (!post) {
     return {
-      title: 'Post Not Found',
+      title: "Post Not Found",
     };
   }
 
@@ -68,13 +66,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: post.title,
       description: post.excerpt || post.metaDescription || undefined,
-      type: 'article',
+      type: "article",
       publishedTime: post.publishedAt?.toISOString(),
       authors: post.author.name ? [post.author.name] : undefined,
       images: post.featuredImage ? [post.featuredImage] : undefined,
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: post.title,
       description: post.excerpt || post.metaDescription || undefined,
       images: post.featuredImage ? [post.featuredImage] : undefined,
@@ -125,21 +123,24 @@ export default async function BlogPostPage({ params }: Props) {
         </h1>
 
         {post.excerpt && (
-          <p className="text-xl text-foreground-muted mb-8">
-            {post.excerpt}
-          </p>
+          <p className="text-xl text-foreground-muted mb-8">{post.excerpt}</p>
         )}
 
         {/* Author & Meta */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-foreground-muted">
           <div className="flex items-center gap-2">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={post.author.image || undefined} alt={post.author.name || ''} />
+              <AvatarImage
+                src={post.author.image || undefined}
+                alt={post.author.name || ""}
+              />
               <AvatarFallback>
-                {post.author.name?.charAt(0).toUpperCase() || 'A'}
+                {post.author.name?.charAt(0).toUpperCase() || "A"}
               </AvatarFallback>
             </Avatar>
-            <span className="font-medium text-foreground">{post.author.name}</span>
+            <span className="font-medium text-foreground">
+              {post.author.name}
+            </span>
           </div>
 
           {post.publishedAt && (

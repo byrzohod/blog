@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { Rss } from 'lucide-react';
+import Link from "next/link";
+import { Rss } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -22,23 +22,11 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/blog" className="text-foreground-muted hover:text-foreground transition-colors">
+                <Link
+                  href="/blog"
+                  className="text-foreground-muted hover:text-foreground transition-colors"
+                >
                   Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-foreground-muted hover:text-foreground transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-foreground-muted hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/archive" className="text-foreground-muted hover:text-foreground transition-colors">
-                  Archive
                 </Link>
               </li>
               <li>
@@ -53,18 +41,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Subscribe */}
+          {/* Status */}
           <div>
-            <h4 className="font-semibold mb-4">Stay Updated</h4>
+            <h4 className="font-semibold mb-4">Status</h4>
             <p className="text-foreground-muted text-sm mb-4">
-              Subscribe to get notified when new posts are published.
+              Independent blog focused on systems, UI, and build craft.
             </p>
-            <Link
-              href="/subscribe"
-              className="inline-flex items-center text-sm text-accent hover:text-accent-hover transition-colors"
-            >
-              Subscribe via email →
-            </Link>
+            <p className="text-sm text-foreground-subtle">
+              Signal stable. Logs updated weekly.
+            </p>
           </div>
         </div>
 
